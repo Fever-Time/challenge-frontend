@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="도전하고 싶으신가요? 피버타임과 함께하세요 !!">
+
+    <!-- title -->
+    <title>피버타임</title>
+
+    <!-- bootstrap css-->
+    <!-- favicon -->
+    <link rel="shortcut icon" type="image/png"
+          href="./static/assets/img/favicon.svg">
+    <!-- google font -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
+    <!-- fontawesome -->
+    <link rel="stylesheet" href="./static/assets/css/all.min.css">
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="./static/assets/bootstrap/css/bootstrap.min.css">
+    <!-- owl carousel -->
+    <link rel="stylesheet" href="./static/assets/css/owl.carousel.css">
+    <!-- magnific popup -->
+    <link rel="stylesheet" href="./static/assets/css/magnific-popup.css">
+    <!-- animate css -->
+    <link rel="stylesheet" href="./static/assets/css/animate.css">
+    <!-- mean menu css -->
+    <link rel="stylesheet" href="./static/assets/css/meanmenu.min.css">
+    <!-- main style -->
+    <link rel="stylesheet" href="./static/assets/css/main.css">
+    <!-- responsive -->
+    <link rel="stylesheet" href="./static/assets/css/responsive.css">
+
+    <!-- jquery -->
+    <script src="./static/assets/js/jquery-1.11.3.min.js"></script>
+
+    <style>
+        #create-form-container {
+            padding-top: 20px;
+        }
+
+        #create-btn-container {
+            display: flex;
+            justify-content: right;
+        }
+
+        #create-cancel-btn {
+            margin-left: 20px;
+        }
+
+        .create-form input {
+            height: 40px;
+        }
+
+        .create-form .input-group-text {
+            width: 120px
+        }
+
+        .btn-lg {
+            border-radius: 50px;
+        }
+
+        #address-container, #radio-container {
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-group input {
+            display: none;
+        }
+
+        .checkbox-checked {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .checkbox-check {
+            background-color: white;
+            border-color: #007bff;
+            color: #007bff;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            setInputDateToday();
+        });
+
+        function onClickCancelBtnHandler() {
+            location.href = "index.html";
+        }
+
+        function createChallenge() {
+            let categories = [];
+            $("input[name='category']:checked").each(function (e) {
+                categories.push($(this).val())
+            })
+
+            let title = $('#title').val()
+            let desc = $("#desc").val()
+            let period = [document.querySelector('#start-period').value, document.querySelector('#end-period').value]
+            let image = $('#formFile')[0].files[0]
+            let address = $('#sample5_address').val()
+            let max = $("#max-people").val();
+            if (address == "") {
+                address = "online";
+            }
+
+            let form_data = new FormData()
+            form_data.append("image_give", image)
+            form_data.append("title_give", title)
+            form_data.append("desc_give", desc)
+            form_data.append("period_give", period)
+            form_data.append("address_give", address)
+            form_data.append("categories_give", categories)
+            form_data.append("max_give", max)
+
+            if (title == "") {
+                alert('챌린지 이름을 입력하세요')
+                return $('#title').focus();
+            } else if (desc == "") {
+                alert('상세 내용을 입력하세요')
+                return $('#desc').focus();
+            } else if (period[0] == "" || period[1] == "") {
+                alert('진행 기간을 입력하세요')
+                return $('#desc').focus();
+            } else if (max < 1 || max > 100) {
+                alert("1~100명 범위로 입력해 주십시오.");
+                return $('#max-people').focus();
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/challenge",
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+
+                success: function (response) { // 성공하면
+                    alert(response["msg"]);
+                    window.location.href = 'index.html'
+                }
+            })
+        }
+
+        function setThumbnail(event) {
+            let reader = new FileReader();
+
+            reader.onload = function (event) {
+                $("#thumbnail").attr('src', event.target.result)
+            };
+
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function onChangeAddressRadio() {
+            if ($("#address-container").css("display") == "block") {
+                $("#address-container").hide();
+            } else {
+                $("#address-container").show();
+            }
+            $("#sample5_address").val("");
+            $("#map-container").hide();
+        }
+
+        function onclickCheckboxHandler(e) {
+            e.classList.toggle("checkbox-checked");
+            e.classList.toggle("checkbox-check");
+        }
+
+        function setInputDateToday() {
+            let today = new Date();
+            let dd = today.getDate();
+            let mm = today.getMonth() + 1;
+            let yyyy = today.getFullYear();
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+            if (mm < 10) {
+                mm = '0' + mm
+            }
+
+            today = yyyy + '-' + mm + '-' + dd;
+            document.getElementById("end-period").setAttribute("min", today);
+            document.getElementById("start-period").setAttribute("min", today);
+        }
+    </script>
+</head>
+<body>
+<!--PreLoader start -->
+<div class="loader">
+    <div class="loader-inner">
+        <div class="circle"></div>
+    </div>
+</div>
+<!--PreLoader end-->
+
+<!-- header start -->
+<div class="top-header-area" id="sticker">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-sm-12 text-center">
+                <div class="main-menu-wrap">
+                    <!-- logo -->
+                    <div class="site-logo">
+                        <a href="index.html">
+                            <img src="./static/assets/img/logo.png" alt="">
+                        </a>
+                    </div>
+                    <!-- logo -->
+
+                    <!-- menu start -->
+                    <nav class="main-menu">
+                        <ul>
+                            <li>
+                                <div class="header-icons">
+                                    <a class="mobile-hide search-bar-icon" href="#"><i
+                                            class="fas fa-search"></i></a>
+                                    <a class="shopping-cart" href="user.html"><i class="fas fa-user"></i></a>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <div class="nav-mobile-show-container">
+                        <a class="mobile-show search-bar-icon" style="right: 100px;" href="#"><i
+                                class="fas fa-search"></i></a>
+                        <a class="mobile-show search-bar-icon" href="user.html"><i class="fas fa-user"></i></a>
+                    </div>
+                    <!-- menu end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- header end -->
+
+<!-- search area start-->
+<div class="search-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <span class="close-btn"><i class="fas fa-window-close"></i></span>
+                <div class="search-bar">
+                    <div class="search-bar-tablecell">
+                        <h3>Search For:</h3>
+                        <input type="text" id="search-input" placeholder="Keywords" name="search">
+                        <button type="submit" onclick="getSearchChallenges()">Search <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- search area end -->
+
+<!-- breadcrumb-section start -->
+<div class="breadcrumb-section breadcrumb-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2 text-center">
+                <div style="cursor: pointer;" onclick="location.href='index.html'" class="breadcrumb-text">
+                    <p>불타오르는 열정</p>
+                    <h1>피버타임</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- breadcrumb section end -->
+
+<!-- single product -->
+<div class="single-product mt-150 mb-100">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5" id="image_container">
+                <div class="single-product-img">
+                    <img id="thumbnail"
+                         style="height: 300px;width:500px"
+                         src="https://dybzsbdm9g4zq.cloudfront.net/default-challenge-img.jfif"
+                         alt="">
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="single-product-content">
+                    <h3>새로운 챌린지 만들기</h3>
+
+                    <div id="create-form-container">
+                        <div class="input-group mb-3 create-form">
+                            <span for="formFile" class="input-group-text">챌린지 이미지</span>
+                            <input class="form-control" type="file" id="formFile" onchange="setThumbnail(event);">
+                        </div>
+
+                        <div class="input-group mb-3 create-form">
+                            <span for="title" class="input-group-text">챌린지 이름</span>
+                            <input class="form-control" type="text" id="title">
+                        </div>
+
+                        <div class="input-group mb-3 create-form">
+                            <span for="desc" class="input-group-text">상세 내용</span>
+                            <input class="form-control" type="text" id="desc">
+                        </div>
+
+                        <div class="input-group mb-3 create-form">
+                            <span class="input-group-text">진행 기간</span>
+                            <input class="form-control" type="date" id="start-period">
+                            <input class="form-control" type="date" id="end-period">
+                        </div>
+                        <div class="input-group mb-3 create-form" style="width: 200px">
+                            <span class="input-group-text">제한 인원</span>
+                            <input class="form-control" type="number" id="max-people" min="1" max="100"
+                                   style="border-radius: 3px" value="10">
+                            <p style="margin: auto">명</p>
+                        </div>
+
+
+                        <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+                            <input type="checkbox" name="category" value="category1" class="btn-check" id="category1"
+                                   autocomplete="off">
+                            <label onclick="onclickCheckboxHandler(this)"
+                                   class="checkbox-check btn btn-outline-primary"
+                                   for="category1">운동</label>
+
+                            <input type="checkbox" name="category" value="category2" class="btn-check" id="category2"
+                                   autocomplete="off">
+                            <label onclick="onclickCheckboxHandler(this)"
+                                   class="checkbox-check btn btn-outline-primary"
+                                   for="category2">공부</label>
+
+                            <input type="checkbox" name="category" value="category3" class="btn-check" id="category3"
+                                   autocomplete="off">
+                            <label onclick="onclickCheckboxHandler(this)"
+                                   class="checkbox-check btn btn-outline-primary"
+                                   for="category3">취미</label>
+                        </div>
+
+                        <input type="hidden" id="address">
+
+                        <div id="radio-container">
+                            <div class="form-check">
+                                <input class="form-check-input" name="addType" type="radio" id="online"
+                                       checked onchange="onChangeAddressRadio()">
+                                <label class="form-check-label" for="online">
+                                    온라인
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" name="addType" type="radio" id="offline"
+                                       onchange="onChangeAddressRadio()">
+                                <label class="form-check-label" for="offline">
+                                    오프라인
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="address-container" style="display: none">
+                            <input type="text" id="sample5_address" placeholder="주소">
+                            <input type="button" onclick="sample5_execDaumPostcode()" value="주소 검색"><br>
+                        </div>
+
+                        <div id="create-btn-container">
+                            <button type="button" class="btn btn-primary btn-lg" onclick="createChallenge()">챌린지 등록
+                            </button>
+                            <button type="button" id="create-cancel-btn" onclick="onClickCancelBtnHandler()"
+                                    class="btn btn-secondary btn-lg">등록 취소
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end single product -->
+
+<div class="more-products mb-150" id="map-container" style="display: none">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2 text-center">
+                <div class="section-title">
+                    <h3><span class="orange-text"></span> 장소</h3>
+                    <div id="map" style="width:100%;height:350px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- copyright start -->
+<div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <p>Copyrights &copy; 2021 - 피버타임, All Rights
+                    Reserved.
+                </p>
+                <!--                <a href="https://imransdesign.com/">Imran Hossain</a> -->
+            </div>
+            <div class="col-lg-6 text-right col-md-12">
+                <div class="social-icons">
+                    <!-- <ul>
+                        <li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
+                    </ul> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- copyright end -->
+
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=7004ea44101be7c75067b28e563db611&libraries=services"></script>
+<script>
+    let mapContainer = document.getElementById('map'), // 지도를 표시할 div
+        mapOption = {
+            center: new daum.maps.LatLng(37.537187, 127.005476), // 지도의 중심좌표
+            level: 5 // 지도의 확대 레벨
+        };
+
+    //지도를 미리 생성
+    let map = new daum.maps.Map(mapContainer, mapOption);
+    //주소-좌표 변환 객체를 생성
+    let geocoder = new daum.maps.services.Geocoder();
+    //마커를 미리 생성
+    let marker = new daum.maps.Marker({
+        position: new daum.maps.LatLng(37.537187, 127.005476),
+        map: map
+    });
+
+    function sample5_execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function (data) {
+                let addr = data.address; // 최종 주소 변수
+
+                // 주소 정보를 해당 필드에 넣는다.
+                document.getElementById("sample5_address").value = addr;
+                // 주소로 상세 정보를 검색
+                geocoder.addressSearch(data.address, function (results, status) {
+                    // 정상적으로 검색이 완료됐으면
+                    if (status === daum.maps.services.Status.OK) {
+
+                        let result = results[0]; //첫번째 결과의 값을 활용
+
+                        // 해당 주소에 대한 좌표를 받아서
+                        let coords = new daum.maps.LatLng(result.y, result.x);
+                        // 지도를 보여준다.
+                        $("#map-container").show()
+                        map.relayout();
+                        // 지도 중심을 변경한다.
+                        map.setCenter(coords);
+                        // 마커를 결과값으로 받은 위치로 옮긴다.
+                        marker.setPosition(coords)
+                    }
+                });
+            }
+        }).open();
+    }
+</script>
+
+<!-- bootstrap js start -->
+<!-- jquery -->
+<script src="./static/assets/js/jquery-1.11.3.min.js"></script>
+<!-- bootstrap -->
+<script src="./static/assets/bootstrap/js/bootstrap.min.js"></script>
+<!-- count down -->
+<script src="./static/assets/js/jquery.countdown.js"></script>
+<!-- isotope -->
+<script src="./static/assets/js/jquery.isotope-3.0.6.min.js"></script>
+<!-- waypoints -->
+<script src="./static/assets/js/waypoints.js"></script>
+<!-- owl carousel -->
+<script src="./static/assets/js/owl.carousel.min.js"></script>
+<!-- magnific popup -->
+<script src="./static/assets/js/jquery.magnific-popup.min.js"></script>
+<!-- mean menu -->
+<script src="./static/assets/js/jquery.meanmenu.min.js"></script>
+<!-- sticker js -->
+<script src="./static/assets/js/sticker.js"></script>
+<!-- main js -->
+<script src="./static/assets/js/main.js"></script>
+<!-- bootstrap js end -->
+</body>
+</html>

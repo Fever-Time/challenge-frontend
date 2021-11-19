@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="도전하고 싶으신가요? 피버타임과 함께하세요 !!">
+
+    <!-- title -->
+    <title>피버타임</title>
+
+    <!-- bootstrap css-->
+    <!-- favicon -->
+    <link rel="shortcut icon" type="image/png"
+          href="./static/assets/img/favicon.svg">
+    <!-- google font -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
+    <!-- fontawesome -->
+    <link rel="stylesheet" href="./static/assets/css/all.min.css">
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="./static/assets/bootstrap/css/bootstrap.min.css">
+    <!-- owl carousel -->
+    <link rel="stylesheet" href="./static/assets/css/owl.carousel.css">
+    <!-- magnific popup -->
+    <link rel="stylesheet" href="./static/assets/css/magnific-popup.css">
+    <!-- animate css -->
+    <link rel="stylesheet" href="./static/assets/css/animate.css">
+    <!-- mean menu css -->
+    <link rel="stylesheet" href="./static/assets/css/meanmenu.min.css">
+    <!-- main style -->
+    <link rel="stylesheet" href="./static/assets/css/main.css">
+    <!-- responsive -->
+    <link rel="stylesheet" href="./static/assets/css/responsive.css">
+
+    <!-- jquery -->
+    <script src="./static/assets/js/jquery-1.11.3.min.js"></script>
+
+    <style>
+        #add-btn {
+            background-color: white;
+            border: solid #F28123;
+            color: #F28123;
+        }
+
+        #add-btn:hover {
+            background-color: #F28123;
+            border: solid white;
+            color: white;
+        }
+
+        .product-image img {
+            width: 250px;
+            height: 200px;
+        }
+
+        a.btnp {
+            background-color: #4e555b;
+        }
+
+        .product-lists {
+            height: auto !important;
+        }
+
+        .single-product-item {
+            position: relative !important;
+        }
+
+    </style>
+    <script>
+        $(document).ready(function ($) {
+            getChallenges()
+        });
+
+        function getChallenges() {
+            $.ajax({
+                type: "GET",
+                url: "/challenges",
+                data: {},
+                success: function (response) {
+                    let challenges = response['challenges']
+                    showChallenges(challenges)
+                }
+            })
+        }
+
+        function showChallenges(challenges) {
+            if (challenges.length == 0) {
+                $('#container__category').hide()
+                $('#no_challenge').show()
+                return
+            }
+
+            for (let i = 0; i < challenges.length; i++) {
+                let id = challenges[i]['_id'];
+                let title = challenges[i]['challenge_title'];
+                let desc = challenges[i]['challenge_desc'];
+                let img = challenges[i]['challenge_img'];
+                let start = challenges[i]['challenge_startTime'];
+                let end = challenges[i]['challenge_endTime'];
+                let category = challenges[i]['challenge_category'];
+                let status = challenges[i]['challenge_status'];
+                let max = challenges[i]['challenge_max'];
+                let people = challenges[i]['people']
+
+                if (status == 2) {
+                    let temp_html = `<div class="col-lg-4 col-md-6 text-center product-lists ${category}">
+                                                <div class="single-product-item">
+                                                    <div class="product-image">
+                                                        <a href="challenge-datail.html/${id}">
+                                                            <img src="https://dybzsbdm9g4zq.cloudfront.net/${img}"
+                                                                 alt="">
+                                                        </a>
+                                                    </div>
+                                                    <h3>${title}</h3>
+                                                    <p class="product-price">
+                                                        <span>
+                                                            <i class="far fa-calendar-alt"></i> 종료된 챌린지
+                                                        </span>
+                                                            ${people}/${max}명
+                                                        </p>
+                                                        <a href="challenge-datail.html/detail?challenge_id=${id}" class="cart-btn btnp">
+                                                            <i class="fas fa-bolt"></i> View Details
+                                                        </a>
+                                                </div>
+                                             </div>`
+                    $('#challenge-list').append(temp_html)
+                } else if (status == 1) {
+                    let temp_html = `<div class="col-lg-4 col-md-6 text-center product-lists ${category}">
+                                                <div class="single-product-item">
+                                                    <div class="product-image">
+                                                        <a href="challenge-datail.html/detail?challenge_id=${id}">
+                                                            <img src="https://dybzsbdm9g4zq.cloudfront.net/${img}"
+                                                                 alt="">
+                                                        </a>
+                                                    </div>
+                                                    <h3>${title}</h3>
+                                                    <p class="product-price">
+                                                        <span>
+                                                            <i class="far fa-calendar-alt"></i> 중단된 챌린지
+                                                        </span>
+                                                            ${people}/${max}명
+                                                        </p>
+                                                        <a href="challenge-datail.html/detail?challenge_id=${id}" class="cart-btn btnp">
+                                                            <i class="fas fa-bolt"></i> View Details
+                                                        </a>
+                                                </div>
+                                             </div>`
+                    $('#challenge-list').append(temp_html)
+                } else {
+                    let temp_html = `<div class="col-lg-4 col-md-6 text-center product-lists ${category}">
+                                                <div class="single-product-item">
+                                                    <div class="product-image">
+                                                        <a href="challenge-datail.html/detail?challenge_id=${id}">
+                                                            <img src="https://dybzsbdm9g4zq.cloudfront.net/${img}"
+                                                                 alt="">
+                                                        </a>
+                                                    </div>
+                                                    <h3>${title}</h3>
+                                                    <p class="product-price">
+                                                        <span>
+                                                            <i class="far fa-calendar-alt"></i> ${start} ~ ${end}
+                                                        </span>
+                                                            ${people}/${max}명
+                                                        </p>
+                                                        <a href="challenge-datail.html/detail?challenge_id=${id}" class="cart-btn">
+                                                            <i class="fas fa-bolt"></i> View Details
+                                                        </a>
+                                                </div>
+                                            </div>`
+                    $('#challenge-list').append(temp_html)
+                }
+            }
+        }
+
+        function onClickCreateChallenge() {
+            if (document.cookie.match("fever-time") != null) {
+                window.location.href = "challenge-create.html"
+            } else {
+                alert("로그인 후 생성해주세요 !!")
+                window.location.href = 'login.html';
+            }
+        }
+
+        function getSearchChallenges() {
+            let search = $("#search-input").val()
+            console.log(search)
+
+            if (search == "") {
+                alert("검색어를 입력해주세요.")
+                return
+            }
+
+            $.ajax({
+                type: "GET",
+                url: "/search",
+                data: {"search": search},
+                success: function (response) { // 성공하면
+                    $(".search-area").toggleClass("search-active")
+                    $('#challenge-list').empty();
+                    let challenges = response['challenges']
+                    console.log(challenges)
+                    showChallenges(challenges)
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+<!--PreLoader start -->
+<div class="loader">
+    <div class="loader-inner">
+        <div class="circle"></div>
+    </div>
+</div>
+<!--PreLoader end-->
+
+<!-- header start -->
+<div class="top-header-area" id="sticker">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-sm-12 text-center">
+                <div class="main-menu-wrap">
+                    <!-- logo -->
+                    <div class="site-logo">
+                        <a href="index.html">
+                            <img src="./static/assets/img/logo.png" alt="">
+                        </a>
+                    </div>
+                    <!-- logo -->
+
+                    <!-- menu start -->
+                    <nav class="main-menu">
+                        <ul>
+                            <li>
+                                <div class="header-icons">
+                                    <a class="mobile-hide search-bar-icon" href="#"><i
+                                            class="fas fa-search"></i></a>
+                                    <a class="shopping-cart" href="user.html"><i class="fas fa-user"></i></a>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <div class="nav-mobile-show-container">
+                        <a class="mobile-show search-bar-icon" style="right: 100px;" href="#"><i
+                                class="fas fa-search"></i></a>
+                        <a class="mobile-show search-bar-icon" href="user.html"><i class="fas fa-user"></i></a>
+                    </div>
+                    <!-- menu end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- header end -->
+
+<!-- search area start-->
+<div class="search-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <span class="close-btn"><i class="fas fa-window-close"></i></span>
+                <div class="search-bar">
+                    <div class="search-bar-tablecell">
+                        <h3>Search For:</h3>
+                        <input type="text" id="search-input" placeholder="Keywords" name="search">
+                        <button type="submit" onclick="getSearchChallenges()">Search <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- search area end -->
+
+<!-- breadcrumb-section start -->
+<div class="breadcrumb-section breadcrumb-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2 text-center">
+                <div style="cursor: pointer;" onclick="location.href='index.html'" class="breadcrumb-text">
+                    <p>불타오르는 열정</p>
+                    <h1>피버타임</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- breadcrumb section end -->
+
+<!-- products -->
+<div class="product-section mt-150 mb-150">
+    <div class="container" style="text-align: center">
+        <div id="no_challenge" style="display: none">
+            <img src="./static/assets/img/error.svg" width="300" height="300"
+                 alt="">
+            <h4 style="margin-top: 30px">챌린지가 없습니다😥</h4>
+        </div>
+
+        <div class="row" id="container__category">
+            <div class="col-md-12">
+                <div class="product-filters">
+                    <ul>
+                        <li class="active" data-filter="*">All</li>
+                        <li data-filter=".category1">운동</li>
+                        <li data-filter=".category2">공부</li>
+                        <li data-filter=".category3">취미</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="row product-lists" id="challenge-list">
+        </div>
+        <!--
+        // 페이지 이동 주석
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="pagination-wrap">
+                    <ul>
+                        <li><a href="#">Prev</a></li>
+                        <li><a href="#">1</a></li>
+                        <li><a class="active" href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li><a href="#">Next</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        -->
+
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div class="pagination-wrap">
+                    <a id="add-btn" class="cart-btn" onclick="onClickCreateChallenge()">
+                        <i class="fas fa-plus"></i> Add new Challenge
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end products -->
+
+<!-- copyright start -->
+<div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <p>Copyrights &copy; 2021 - 피버타임, All Rights
+                    Reserved.
+                </p>
+                <!--                <a href="https://imransdesign.com/">Imran Hossain</a> -->
+            </div>
+            <div class="col-lg-6 text-right col-md-12">
+                <div class="social-icons">
+                    <!-- <ul>
+                        <li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
+                    </ul> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- copyright end -->
+
+<!-- bootstrap js start -->
+<!-- jquery -->
+<script src="./static/assets/js/jquery-1.11.3.min.js"></script>
+<!-- bootstrap -->
+<script src="./static/assets/bootstrap/js/bootstrap.min.js"></script>
+<!-- count down -->
+<script src="./static/assets/js/jquery.countdown.js"></script>
+<!-- isotope -->
+<script src="./static/assets/js/jquery.isotope-3.0.6.min.js"></script>
+<!-- waypoints -->
+<script src="./static/assets/js/waypoints.js"></script>
+<!-- owl carousel -->
+<script src="./static/assets/js/owl.carousel.min.js"></script>
+<!-- magnific popup -->
+<script src="./static/assets/js/jquery.magnific-popup.min.js"></script>
+<!-- mean menu -->
+<script src="./static/assets/js/jquery.meanmenu.min.js"></script>
+<!-- sticker js -->
+<script src="./static/assets/js/sticker.js"></script>
+<!-- main js -->
+<script src="./static/assets/js/main.js"></script>
+<!-- bootstrap js end -->
+</body>
+</html>
