@@ -69,7 +69,7 @@
     </style>
     <script>
         $(document).ready(function ($) {
-            getChallenges()
+            // getChallenges()
         });
 
         function getChallenges() {
@@ -174,12 +174,12 @@
         }
 
         function onClickCreateChallenge() {
-            if (document.cookie.match("fever-time") != null) {
+            // if (document.cookie.match("fever-time") != null) {
                 window.location.href = "challenge-create.html"
-            } else {
-                alert("로그인 후 생성해주세요 !!")
-                window.location.href = 'login.html';
-            }
+            // } else {
+            //     alert("로그인 후 생성해주세요 !!")
+            //     window.location.href = 'login.html';
+            // }
         }
 
         function getSearchChallenges() {
@@ -313,6 +313,29 @@
         </div>
 
         <div class="row product-lists" id="challenge-list">
+
+            <div class="col-lg-4 col-md-6 text-center product-lists">
+                <div class="single-product-item">
+                    <div class="product-image">
+                        <a href="challenge-detail.html">
+                            <img src="https://img.fevertime.shop/default-challenge-img.jfif"
+                                 alt="">
+                        </a>
+                    </div>
+                    <h3>운동하기</h3>
+                    <p class="product-price">
+                        <span>
+                            <i class="far fa-calendar-alt"></i> 2020.01.01 ~ 2020.12.12
+                        </span>
+                        00/10명
+                    </p>
+                    <a href="challenge-detail.html" class="cart-btn">
+                        <i class="fas fa-bolt"></i> View Details
+                    </a>
+                </div>
+            </div>
+
+
         </div>
         <!--
         // 페이지 이동 주석
