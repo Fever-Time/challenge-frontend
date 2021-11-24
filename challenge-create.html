@@ -143,6 +143,9 @@
                 cache: false,
                 contentType: false,
                 processData: false,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
 
                 success: function (response) { // 성공하면
                     alert(response);
