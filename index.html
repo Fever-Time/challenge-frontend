@@ -66,6 +66,9 @@
             position: relative !important;
         }
 
+        .cursor-none {
+            cursor: auto;
+        }
     </style>
     <script>
         $(document).ready(function ($) {
@@ -175,7 +178,7 @@
 
         function onClickCreateChallenge() {
             // if (document.cookie.match("fever-time") != null) {
-                window.location.href = "challenge-create.html"
+            window.location.href = "challenge-create.html"
             // } else {
             //     alert("로그인 후 생성해주세요 !!")
             //     window.location.href = 'login.html';
@@ -222,7 +225,7 @@
             <div class="col-lg-12 col-sm-12 text-center">
                 <div class="main-menu-wrap">
                     <!-- logo -->
-                    <div class="site-logo">
+                    <div class="site-logo" style="padding: 0;">
                         <a href="index.html">
                             <img src="./static/assets/img/logo.png" alt="">
                         </a>
@@ -232,21 +235,34 @@
                     <!-- menu start -->
                     <nav class="main-menu">
                         <ul>
+                            <li class="current-list-item">
+                                <a href="index.html">Home</a>
+                            </li>
+                            <li>
+                                <a href="#">Feed</a>
+                            </li>
+                            <li>
+                                <a href="#">User</a>
+                                <ul class="sub-menu">
+                                    <li><a href="user.html">My Page</a></li>
+                                    <li><a href="#" data-toggle="modal" data-target="#exampleModal">Login</a></li>
+                                </ul>
+                            </li>
+
                             <li>
                                 <div class="header-icons">
-                                    <a class="mobile-hide search-bar-icon" href="#"><i
-                                            class="fas fa-search"></i></a>
-                                    <a class="shopping-cart" href="user.html"><i class="fas fa-user"></i></a>
+                                    <a class="shopping-cart" href="#">
+                                        1000 <i class="fab fa-bitcoin"></i>
+                                    </a>
+                                    <a class="mobile-hide search-bar-icon" href="#">
+                                        <i class="fas fa-search"></i>
+                                    </a>
                                 </div>
                             </li>
                         </ul>
                     </nav>
-
-                    <div class="nav-mobile-show-container">
-                        <a class="mobile-show search-bar-icon" style="right: 100px;" href="#"><i
-                                class="fas fa-search"></i></a>
-                        <a class="mobile-show search-bar-icon" href="user.html"><i class="fas fa-user"></i></a>
-                    </div>
+                    <a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                    <div class="mobile-menu"></div>
                     <!-- menu end -->
                 </div>
             </div>
@@ -254,6 +270,26 @@
     </div>
 </div>
 <!-- header end -->
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Kakao Login
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- search area start-->
 <div class="search-area">
