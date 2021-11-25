@@ -128,26 +128,26 @@
             //     }
 
             // {% else %}
-                let pwd = $('#unregister_nowPwd').val();
-                console.log(pwd)
-                $.ajax({
-                    type: "POST",
-                    url: '/check_pwd',
-                    data: {'pwd': pwd},
-                    success: function (response) {
-                        if (response['result']) {
-                            $('#unregister_pwdHelp').text('비밀번호가 일치합니다 ✔')
-                            $('#unregister_pwdHelp').addClass('canChange');
-                            $('#unregister_edit').removeClass('change');
-                            $('#unregister_edit').addClass('unregister');
-                        } else {
-                            $('#unregister_pwdHelp').text('비밀번호가 일치하지 않습니다.');
-                            $('#unregister_edit').addClass('change');
-                            $('#unregister_pwdHelp').removeClass('canChange');
-                            $('#unregister_edit').removeClass('unregister');
-                        }
+            let pwd = $('#unregister_nowPwd').val();
+            console.log(pwd)
+            $.ajax({
+                type: "POST",
+                url: '/check_pwd',
+                data: {'pwd': pwd},
+                success: function (response) {
+                    if (response['result']) {
+                        $('#unregister_pwdHelp').text('비밀번호가 일치합니다 ✔')
+                        $('#unregister_pwdHelp').addClass('canChange');
+                        $('#unregister_edit').removeClass('change');
+                        $('#unregister_edit').addClass('unregister');
+                    } else {
+                        $('#unregister_pwdHelp').text('비밀번호가 일치하지 않습니다.');
+                        $('#unregister_edit').addClass('change');
+                        $('#unregister_pwdHelp').removeClass('canChange');
+                        $('#unregister_edit').removeClass('unregister');
                     }
-                });
+                }
+            });
             // {% endif %}
         }
 
@@ -268,6 +268,11 @@
                 })
             }
         }
+
+        function logout() {
+            localStorage.removeItem("token");
+            location.href = "index.html";
+        }
     </script>
 </head>
 <body>
@@ -307,7 +312,7 @@
                                 <a href="#">User</a>
                                 <ul class="sub-menu">
                                     <li><a href="user.html">My Page</a></li>
-                                    <li><a href="#" data-toggle="modal" data-target="#exampleModal">Login</a></li>
+                                    <li><a href="#" onclick="logout()">Logout</a></li>
                                 </ul>
                             </li>
 
@@ -387,7 +392,7 @@
                                  data-parent="#accordionExample">
                                 <div class="card-body">
                                     <div class="shipping-address-form">
-                                            <p>user name</p>
+                                        <p>user name</p>
                                         <a onclick="updateUserName()" class="read-more-btn">이름 변경 <i
                                                 class="fas fa-angle-right"></i></a>
                                     </div>
@@ -408,18 +413,18 @@
                         </thead>
 
                         <tbody>
-                            <tr class="table-body-row" onclick="onClickChallenge('0')">
+                        <tr class="table-body-row" onclick="onClickChallenge('0')">
 
-                                <td class="product-image">
-                                    <img src=""
-                                         alt="">
-                                </td>
-                                <td class="product-name">챌린지 제목</td>
-                                <td class="product-price">
-                                        <i class="far fa-calendar-alt"></i>
-                                        2020.01.01 +' ~ '+ 2020.02.02 
-                                </td>
-                            </tr>
+                            <td class="product-image">
+                                <img src=""
+                                     alt="">
+                            </td>
+                            <td class="product-name">챌린지 제목</td>
+                            <td class="product-price">
+                                <i class="far fa-calendar-alt"></i>
+                                2020.01.01 +' ~ '+ 2020.02.02
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -457,12 +462,7 @@
                         </tbody>
                     </table>
                     <div class="cart-buttons">
-                        <a href="#" id="logout-user-btn" class="boxed-btn" onclick="sign_out()">로그아웃</a>
-                            <a href="#" class="boxed-btn" data-toggle="modal" data-target="#editModal">비밀번호 수정</a>
-                            <a href="#" id="delete-user-btn" class="boxed-btn black" data-toggle="modal"
-                               data-target="#unregister_kakao">회원탈퇴</a>
-                            <a href="#" id="delete-user-btn" class="boxed-btn black" data-toggle="modal"
-                               data-target="#unregister">회원탈퇴</a>
+                        <a href="#" id="delete-user-btn" class="boxed-btn black">회원탈퇴</a>
                     </div>
                 </div>
             </div>
@@ -470,105 +470,6 @@
     </div>
 </div>
 <!-- end cart -->
-
-<!-- 비밀번호 수정 모달-->
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">비밀번호 변경</h4>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label for="exampleInputEmail1">현재 비밀번호</label>
-                        <input type="password" class="form-control" id="nowPwd" onkeyup="check_pwd()"
-                               aria-describedby="emailHelp"
-                               placeholder="Now your Password">
-                        <small id="pwdHelp" class="form-text text-muted"></small>
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputPassword1">변경할 비밀번호</label>
-                        <input type="password" class="form-control" id="changePwd" onkeyup="change_pwd()"
-                               placeholder="Password">
-                        <small id="regHelp" class="form-text text-muted"></small>
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputPassword1">한번 더 입력해주세요</label>
-                        <input type="password" class="form-control" id="doubleCheckPwd" onkeyup="doubleCheck_pwd()"
-                               placeholder="Password">
-                        <small id="regDoubleHelp" class="form-text text-muted"></small>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
-                <button type="button" class="btn btn-primary change" id="edit" onclick="edit_pwd()">수정하기</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- end Modal-->
-
-<!-- 카카오 회원탈퇴 모달-->
-    <!-- <div class="modal fade" id="unregister_kakao" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">회원탈퇴</h4>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <label for="exampleInputEmail1">'회원탈퇴'를 적어주세요</label>
-                            <input type="text" class="form-control" id="unregister_kakaoPwd"
-                                   aria-describedby="emailHelp" onkeyup="unregister_check_pwd()"
-                                   placeholder="회원탈퇴">
-                            <small id="unregister_pwdHelp" class="form-text text-muted"></small>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
-                    <button type="button" class="btn btn-primary change" id="unregister_edit" onclick="unregister()">
-                        회원탈퇴
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- 이메일 회원탈퇴 모달-->
-    <div class="modal fade" id="unregister" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">본인인증</h4>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <label for="exampleInputEmail1">비밀번호</label>
-                            <input type="password" class="form-control" id="unregister_nowPwd"
-                                   onkeyup="unregister_check_pwd()"
-                                   aria-describedby="emailHelp"
-                                   placeholder="Now your Password">
-                            <small id="unregister_pwdHelp" class="form-text text-muted"></small>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
-                    <button type="button" class="btn btn-primary change" id="unregister_edit" onclick="unregister()">
-                        회원탈퇴
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-<!-- end Modal-->
 
 <!-- copyright start -->
 <div class="copyright">

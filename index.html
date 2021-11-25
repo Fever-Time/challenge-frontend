@@ -36,6 +36,10 @@
     <!-- jquery -->
     <script src="./static/assets/js/jquery-1.11.3.min.js"></script>
 
+    <!-- kakao login-->
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+    <script src="static/assets/js/kakao-login.js"></script>
+
     <style>
         #add-btn {
             background-color: white;
@@ -272,7 +276,8 @@
 <!-- header end -->
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -281,8 +286,9 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                Kakao Login
+            <div class="modal-body" style="">
+                <img onclick="loginWithKakao()" style="cursor:pointer;"
+                     src="static/assets/img/kakao_login_large_wide.png" alt="카카오 로그인"/>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

@@ -41,6 +41,10 @@
             integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
             crossorigin="anonymous"></script>
 
+    <!-- kakao login-->
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+    <script src="static/assets/js/kakao-login.js"></script>
+
     <!-- file upload -->
     <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
 
@@ -184,12 +188,12 @@
             //     } else if (G_CHALLENGE_STATUS === 2) {
             //         alert("종료된 챌린지 입니다 !!")
             //     } else {
-                    if ($("#join-form-container").css("display") == "block") {
-                        $("#join-form-container").hide();
-                    } else {
-                        $("#join-form-container").show();
-                    }
-                // }
+            if ($("#join-form-container").css("display") == "block") {
+                $("#join-form-container").hide();
+            } else {
+                $("#join-form-container").show();
+            }
+            // }
             // }
         }
 
@@ -401,7 +405,7 @@
                                     <div id="check-challenge">
                                         </div>
                                             ${categories !== '' ?
-                                `<p><strong>Categories: ${categories} </strong></p>` : `<p><strong>Categories: 없음</strong></p>`}
+                `<p><strong>Categories: ${categories} </strong></p>` : `<p><strong>Categories: 없음</strong></p>`}
                                         <div id="join-form-container" style="display: none;">
                                             <div class="input-group mb-3 join-form">
                                                 <span for="formFile" class="input-group-text">챌린지 이미지</span>
@@ -557,7 +561,8 @@
 <!-- header end -->
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -567,7 +572,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                Kakao Login
+                <img onclick="loginWithKakao()" style="cursor:pointer;"
+                     src="static/assets/img/kakao_login_large_wide.png" alt="카카오 로그인"/>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -656,7 +662,7 @@
                             <i class="fa fa-check"></i>챌린지 인증
                         </a>
                     </div>
-                    <div id ="pauseDelete" class="col-md-12 deleteBtn-container">
+                    <div id="pauseDelete" class="col-md-12 deleteBtn-container">
                     </div>
                 </div>
             </div>

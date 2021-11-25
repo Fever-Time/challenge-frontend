@@ -36,6 +36,10 @@
     <!-- jquery -->
     <script src="./static/assets/js/jquery-1.11.3.min.js"></script>
 
+    <!-- kakao login-->
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+    <script src="static/assets/js/kakao-login.js"></script>
+
     <style>
         @import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css);
 
@@ -307,7 +311,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                Kakao Login
+                <img onclick="loginWithKakao()" style="cursor:pointer;"
+                     src="static/assets/img/kakao_login_large_wide.png" alt="카카오 로그인"/>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
