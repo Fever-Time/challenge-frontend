@@ -174,24 +174,15 @@
         })
 
         function onClickJoinBtnHandler() {
-            // let cookie = document.cookie.match("fever-time");
-
-            // if (cookie == null) {
-            //     alert("로그인후 챌린지에 도전해주세요 !!")
-            //     window.location.replace("login.html")
-            // } else {
-            //     if (G_CHALLENGE_STATUS === 1) {
-            //         alert("참여가 중지된 챌린지 입니다 !!")
-            //     } else if (G_CHALLENGE_STATUS === 2) {
-            //         alert("종료된 챌린지 입니다 !!")
-            //     } else {
-            if ($("#join-form-container").css("display") == "block") {
-                $("#join-form-container").hide();
+            if (localStorage.getItem("token") == null) {
+                alert("로그인후 챌린지에 도전해주세요 !!")
             } else {
-                $("#join-form-container").show();
+                if ($("#join-form-container").css("display") == "block") {
+                    $("#join-form-container").hide();
+                } else {
+                    $("#join-form-container").show();
+                }
             }
-            // }
-            // }
         }
 
 
@@ -222,7 +213,6 @@
             });
         }
 
-
         function getChallenge() {
             $.ajax({
                 type: "GET",
@@ -233,7 +223,7 @@
                     let challenge = response;
                     let categories = [];
                     let certifications = response['certifications'];
-                    for(let i=0;i<response['categories'].length;i++){
+                    for (let i = 0; i < response['categories'].length; i++) {
                         categories[i] = response['categories'][i]["name"];
                     }
                     // let related_challenge = response['related_challenge'];
@@ -357,7 +347,7 @@
             }
         }
 
-        //카테고리 같은 연관 챌린지 보여주기
+        // 카테고리 같은 연관 챌린지 보여주기
         function showRelated(related) {
             for (let i = 0; i < related.length; i++) {
                 if (related[i]['challenge_status'] === 0 && related[i]['challenge_max'] !== related[i]['people']) {
@@ -508,51 +498,51 @@
 <div class="single-product mt-150 mb-150">
     <div class="container">
         <div class="row" id="single-challenge">
-<!--            <div class="col-md-5">-->
-<!--                <div class="single-product-img">-->
-<!--                    <img src="https://img.fevertime.shop/default-challenge-img.jfif"-->
-<!--                         alt="">-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="col-md-7">-->
-<!--                <div class="single-product-content">-->
-<!--                    <h3>title</h3>-->
-<!--                    <p class="single-product-pricing">-->
-<!--                        <span>-->
-<!--                            <i class="far fa-calendar-alt"></i> 2020.01.01 ~ 2020.02.02-->
-<!--                        </span>-->
-<!--                        4 / 10명-->
-<!--                    </p>-->
-<!--                    <p>describe</p>-->
+            <!--            <div class="col-md-5">-->
+            <!--                <div class="single-product-img">-->
+            <!--                    <img src="https://img.fevertime.shop/default-challenge-img.jfif"-->
+            <!--                         alt="">-->
+            <!--                </div>-->
+            <!--            </div>-->
+            <!--            <div class="col-md-7">-->
+            <!--                <div class="single-product-content">-->
+            <!--                    <h3>title</h3>-->
+            <!--                    <p class="single-product-pricing">-->
+            <!--                        <span>-->
+            <!--                            <i class="far fa-calendar-alt"></i> 2020.01.01 ~ 2020.02.02-->
+            <!--                        </span>-->
+            <!--                        4 / 10명-->
+            <!--                    </p>-->
+            <!--                    <p>describe</p>-->
 
-<!--                    <div id="check-challenge">-->
-<!--                        <a onclick="onClickJoinBtnHandler()" class="cart-btn">-->
-<!--                            <i class="fas fa-bolt"></i>Go to Challenge-->
-<!--                        </a>-->
-<!--                        <a onclick="location.href='index.html'" class="cart-btn-h">-->
-<!--                            <i class="fas fa-home"></i> Go to Main-->
-<!--                        </a>-->
-<!--                    </div>-->
-<!--                    <p><strong>Categories: 공부 </strong></p>-->
-<!--                    <div id="join-form-container" style="display: none;">-->
-<!--                        <div class="input-group mb-3 join-form">-->
-<!--                            <span for="formFile" class="input-group-text">챌린지 이미지</span>-->
-<!--                            <input class="form-control" type="file" id="formFile">-->
-<!--                        </div>-->
+            <!--                    <div id="check-challenge">-->
+            <!--                        <a onclick="onClickJoinBtnHandler()" class="cart-btn">-->
+            <!--                            <i class="fas fa-bolt"></i>Go to Challenge-->
+            <!--                        </a>-->
+            <!--                        <a onclick="location.href='index.html'" class="cart-btn-h">-->
+            <!--                            <i class="fas fa-home"></i> Go to Main-->
+            <!--                        </a>-->
+            <!--                    </div>-->
+            <!--                    <p><strong>Categories: 공부 </strong></p>-->
+            <!--                    <div id="join-form-container" style="display: none;">-->
+            <!--                        <div class="input-group mb-3 join-form">-->
+            <!--                            <span for="formFile" class="input-group-text">챌린지 이미지</span>-->
+            <!--                            <input class="form-control" type="file" id="formFile">-->
+            <!--                        </div>-->
 
-<!--                        <div class="input-group mb-3 join-form">-->
-<!--                            <span for="formText" class="input-group-text">챌린지 후기</span>-->
-<!--                            <input class="form-control" type="text" id="formText">-->
-<!--                        </div>-->
+            <!--                        <div class="input-group mb-3 join-form">-->
+            <!--                            <span for="formText" class="input-group-text">챌린지 후기</span>-->
+            <!--                            <input class="form-control" type="text" id="formText">-->
+            <!--                        </div>-->
 
-<!--                        <a onclick="onClickCheck()" class="cart-btn-c">-->
-<!--                            <i class="fa fa-check"></i>챌린지 인증-->
-<!--                        </a>-->
-<!--                    </div>-->
-<!--                    <div id="pauseDelete" class="col-md-12 deleteBtn-container">-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
+            <!--                        <a onclick="onClickCheck()" class="cart-btn-c">-->
+            <!--                            <i class="fa fa-check"></i>챌린지 인증-->
+            <!--                        </a>-->
+            <!--                    </div>-->
+            <!--                    <div id="pauseDelete" class="col-md-12 deleteBtn-container">-->
+            <!--                    </div>-->
+            <!--                </div>-->
+            <!--            </div>-->
 
             <div class="col-md-12 deleteBtn-container">
             </div>
