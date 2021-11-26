@@ -75,18 +75,17 @@
         }
     </style>
     <script>
-        $(document).ready(function ($) {
-            // getChallenges()
+        $(document).ready(function () {
+            getChallenges()
         });
 
         function getChallenges() {
             $.ajax({
                 type: "GET",
-                url: "/challenges",
+                url: "http://localhost:8080/challenges",
                 data: {},
                 success: function (response) {
-                    let challenges = response['challenges']
-                    showChallenges(challenges)
+                    showChallenges(response)
                 }
             })
         }
@@ -99,67 +98,22 @@
             }
 
             for (let i = 0; i < challenges.length; i++) {
-                let id = challenges[i]['_id'];
-                let title = challenges[i]['challenge_title'];
-                let desc = challenges[i]['challenge_desc'];
-                let img = challenges[i]['challenge_img'];
-                let start = challenges[i]['challenge_startTime'];
-                let end = challenges[i]['challenge_endTime'];
-                let category = challenges[i]['challenge_category'];
-                let status = challenges[i]['challenge_status'];
-                let max = challenges[i]['challenge_max'];
-                let people = challenges[i]['people']
+                let id = challenges[i]['challengeId'];
+                let title = challenges[i]['title'];
+                let desc = challenges[i]['description'];
+                let img = challenges[i]['image'];
+                let start = challenges[i]['startDate'];
+                let end = challenges[i]['endDate'];
+                let category = challenges[i]['categories'];
+                // let status = challenges[i]['challenge_status'];
+                let limitPerson = challenges[i]['limitPerson'];
+                let participants = challenges[i]['participants']
 
-                if (status == 2) {
-                    let temp_html = `<div class="col-lg-4 col-md-6 text-center product-lists ${category}">
+                let temp_html = `<div class="col-lg-4 col-md-6 text-center product-lists ${category["htmlClassName"]}">
                                                 <div class="single-product-item">
                                                     <div class="product-image">
-                                                        <a href="challenge-datail.html/${id}">
-                                                            <img src="https://dybzsbdm9g4zq.cloudfront.net/${img}"
-                                                                 alt="">
-                                                        </a>
-                                                    </div>
-                                                    <h3>${title}</h3>
-                                                    <p class="product-price">
-                                                        <span>
-                                                            <i class="far fa-calendar-alt"></i> 종료된 챌린지
-                                                        </span>
-                                                            ${people}/${max}명
-                                                        </p>
-                                                        <a href="challenge-datail.html/detail?challenge_id=${id}" class="cart-btn btnp">
-                                                            <i class="fas fa-bolt"></i> View Details
-                                                        </a>
-                                                </div>
-                                             </div>`
-                    $('#challenge-list').append(temp_html)
-                } else if (status == 1) {
-                    let temp_html = `<div class="col-lg-4 col-md-6 text-center product-lists ${category}">
-                                                <div class="single-product-item">
-                                                    <div class="product-image">
-                                                        <a href="challenge-datail.html/detail?challenge_id=${id}">
-                                                            <img src="https://dybzsbdm9g4zq.cloudfront.net/${img}"
-                                                                 alt="">
-                                                        </a>
-                                                    </div>
-                                                    <h3>${title}</h3>
-                                                    <p class="product-price">
-                                                        <span>
-                                                            <i class="far fa-calendar-alt"></i> 중단된 챌린지
-                                                        </span>
-                                                            ${people}/${max}명
-                                                        </p>
-                                                        <a href="challenge-datail.html/detail?challenge_id=${id}" class="cart-btn btnp">
-                                                            <i class="fas fa-bolt"></i> View Details
-                                                        </a>
-                                                </div>
-                                             </div>`
-                    $('#challenge-list').append(temp_html)
-                } else {
-                    let temp_html = `<div class="col-lg-4 col-md-6 text-center product-lists ${category}">
-                                                <div class="single-product-item">
-                                                    <div class="product-image">
-                                                        <a href="challenge-datail.html/detail?challenge_id=${id}">
-                                                            <img src="https://dybzsbdm9g4zq.cloudfront.net/${img}"
+                                                        <a onclick="location.href='challenge-detail.html?challengeId=${id}'">
+                                                            <img src="${img}"
                                                                  alt="">
                                                         </a>
                                                     </div>
@@ -168,15 +122,14 @@
                                                         <span>
                                                             <i class="far fa-calendar-alt"></i> ${start} ~ ${end}
                                                         </span>
-                                                            ${people}/${max}명
+                                                            ${participants}/${limitPerson}명
                                                         </p>
-                                                        <a href="challenge-datail.html/detail?challenge_id=${id}" class="cart-btn">
+                                                        <a onclick="location.href='challenge-detail.html?challengeId=${id}'" class="cart-btn">
                                                             <i class="fas fa-bolt"></i> View Details
                                                         </a>
                                                 </div>
                                             </div>`
-                    $('#challenge-list').append(temp_html)
-                }
+                $('#challenge-list').append(temp_html)
             }
         }
 
@@ -356,26 +309,26 @@
 
         <div class="row product-lists" id="challenge-list">
 
-            <div class="col-lg-4 col-md-6 text-center product-lists">
-                <div class="single-product-item">
-                    <div class="product-image">
-                        <a href="challenge-detail.html">
-                            <img src="https://img.fevertime.shop/default-challenge-img.jfif"
-                                 alt="">
-                        </a>
-                    </div>
-                    <h3>운동하기</h3>
-                    <p class="product-price">
-                        <span>
-                            <i class="far fa-calendar-alt"></i> 2020.01.01 ~ 2020.12.12
-                        </span>
-                        00/10명
-                    </p>
-                    <a href="challenge-detail.html" class="cart-btn">
-                        <i class="fas fa-bolt"></i> View Details
-                    </a>
-                </div>
-            </div>
+<!--            <div class="col-lg-4 col-md-6 text-center product-lists">-->
+<!--                <div class="single-product-item">-->
+<!--                    <div class="product-image">-->
+<!--                        <a href="challenge-detail.html">-->
+<!--                            <img src="https://img.fevertime.shop/default-challenge-img.jfif"-->
+<!--                                 alt="">-->
+<!--                        </a>-->
+<!--                    </div>-->
+<!--                    <h3>운동하기</h3>-->
+<!--                    <p class="product-price">-->
+<!--                        <span>-->
+<!--                            <i class="far fa-calendar-alt"></i> 2020.01.01 ~ 2020.12.12-->
+<!--                        </span>-->
+<!--                        00/10명-->
+<!--                    </p>-->
+<!--                    <a href="challenge-detail.html" class="cart-btn">-->
+<!--                        <i class="fas fa-bolt"></i> View Details-->
+<!--                    </a>-->
+<!--                </div>-->
+<!--            </div>-->
 
 
         </div>
