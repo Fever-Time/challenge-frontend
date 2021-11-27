@@ -221,16 +221,14 @@
                 success: function (response) {
                     console.log(response)
                     let challenge = response;
-                    let categories = [];
+                    let category = response['category'];
                     let certifications = response['certifications'];
-                    for (let i = 0; i < response['categories'].length; i++) {
-                        categories[i] = response['categories'][i]["name"];
-                    }
+
                     // let related_challenge = response['related_challenge'];
                     // let status = response['status'];
                     // let status_join = response['status_join'];
                     // G_CHALLENGE_STATUS = challenge['challenge_status']
-                    showDetail(challenge, categories);
+                    showDetail(challenge, category)
                     checkChallenge(challenge)
                     showCheck(certifications);
                     showMap(challenge);
@@ -281,8 +279,7 @@
 
                                     <div id="check-challenge">
                                         </div>
-                                            ${categories !== '' ?
-                `<p><strong>Categories: ${categories} </strong></p>` : `<p><strong>Categories: 없음</strong></p>`}
+                                    <p><strong>Categories: ${categories} </strong></p>
                                         <div id="join-form-container" style="display: none;">
                                             <div class="input-group mb-3 join-form">
                                                 <span for="formFile" class="input-group-text">챌린지 이미지</span>
@@ -568,44 +565,6 @@
         </div>
     </div>
 </div>
-
-<!-- more products -->
-<div class="more-products mb-150">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 offset-lg-2 text-center">
-                <div class="section-title">
-                    <h3><span class="orange-text">Related</span> Challenge!</h3>
-                    <p>다른 사람의 챌린지에 참여해보세요!</p>
-                </div>
-            </div>
-        </div>
-        <div class="row" id="related">
-            <div class="col-lg-4 col-md-6 text-center">
-                <div class="single-product-item">
-                    <div class="product-image">
-                        <a href="challenge-detail.html">
-                            <img src="https://img.fevertime.shop/default-challenge-img.jfif"
-                                 alt=""
-                                 class="related-challenge-img">
-                        </a>
-                    </div>
-                    <h3>연관챌린지 제목</h3>
-                    <p class="product-price">
-                        <span>
-                            <i class="far fa-calendar-alt"></i> 2020.01.01 ~ 2020.12.12
-                        </span>
-                        6명 참가
-                    </p>
-                    <a href="challenge-detail.html" class="cart-btn">
-                        <i class="fas fa-bolt"></i> Go to Challenge
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- end more products -->
 
 <!-- copyright start -->
 <div class="copyright">
