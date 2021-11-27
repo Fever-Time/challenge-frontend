@@ -13,6 +13,7 @@ function loginWithKakao() {
                 success: function (response) {
                     localStorage.setItem("token", response['token']);
                     localStorage.setItem("username", response['username']);
+                    window.location.reload();
                 }
             })
         },
