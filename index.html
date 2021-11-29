@@ -188,13 +188,12 @@
 
             $.ajax({
                 type: "GET",
-                url: "/search",
+                url: "http://localhost:8080/search",
                 data: {"search": search},
                 success: function (response) { // 성공하면
                     $(".search-area").toggleClass("search-active")
                     $('#challenge-list').empty();
-                    let challenges = response['challenges']
-                    showChallenges(challenges)
+                    showChallenges(response)
                 }
             })
         }
