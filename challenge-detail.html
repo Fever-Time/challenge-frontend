@@ -221,14 +221,13 @@
                 success: function (response) {
                     console.log(response)
                     let challenge = response;
-                    let category = response['category'];
                     let certifications = response['certifications'];
 
                     // let related_challenge = response['related_challenge'];
                     // let status = response['status'];
                     // let status_join = response['status_join'];
                     // G_CHALLENGE_STATUS = challenge['challenge_status']
-                    showDetail(challenge, category)
+                    showDetail(challenge)
                     checkChallenge(challenge)
                     showCheck(certifications);
                     showMap(challenge);
@@ -260,7 +259,7 @@
 
 
         // 챌린지 기본 정보 보여주기
-        function showDetail(challenge, categories) {
+        function showDetail(challenge) {
             let temp_html = `<div class="col-md-5">
                                 <div class="single-product-img">
                                     <img src="${challenge['image']}" alt="">
@@ -279,7 +278,7 @@
 
                                     <div id="check-challenge">
                                         </div>
-                                    <p><strong>Categories: ${categories} </strong></p>
+                                    <p><strong>Categories: ${challenge['category']['name']} </strong></p>
                                         <div id="join-form-container" style="display: none;">
                                             <div class="input-group mb-3 join-form">
                                                 <span for="formFile" class="input-group-text">챌린지 이미지</span>

@@ -70,13 +70,32 @@
             position: relative !important;
         }
 
-        .cursor-none {
-            cursor: auto;
+        .btn {
+            margin-right: 10px;
+            width: 80px;
+            height: 50px;
+            font-weight: bold;
+            color: black;
+            font-size: medium;
+            border: black solid 2px;
+            background-color: white;
+            border-radius: 30px;
         }
+
+        .btn:hover {
+            background-color: #F28123;
+            border: solid white;
+            color: white;
+        }
+
     </style>
     <script>
         $(document).ready(function () {
-            getChallenges();
+            getChallenges("All");
+            $("input:button[name='button']").on('click', function () {
+                getChallenges($(this).val());
+            });
+
             $.ajaxSetup({
                 error: function (jqXHR, exception) {
                     switch (jqXHR.status) {
@@ -91,23 +110,28 @@
             });
         })
 
-        function getChallenges() {
+        function getChallenges(kind) {
+            console.log(kind)
             $.ajax({
                 type: "GET",
                 url: "http://localhost:8080/challenges",
-                data: {},
+                data: {"kind": kind},
                 success: function (response) {
                     showChallenges(response)
+                    console.log(response)
                 }
             })
+
         }
 
         function showChallenges(challenges) {
             if (challenges.length == 0) {
-                $('#container__category').hide()
+                // $('#container__category').hide()
                 $('#no_challenge').show()
+                $('#challenge-list').empty()
                 return
             }
+            $('#challenge-list').empty()
 
             for (let i = 0; i < challenges.length; i++) {
                 let id = challenges[i]['challengeId'];
@@ -116,7 +140,7 @@
                 let img = challenges[i]['image'];
                 let start = challenges[i]['startDate'];
                 let end = challenges[i]['endDate'];
-                let category = challenges[i]['categories'];
+                let category = challenges[i]['category']['name'];
                 // let status = challenges[i]['challenge_status'];
                 let limitPerson = challenges[i]['limitPerson'];
                 let participants = challenges[i]['participants']
@@ -164,13 +188,12 @@
 
             $.ajax({
                 type: "GET",
-                url: "/search",
+                url: "http://localhost:8080/search",
                 data: {"search": search},
                 success: function (response) { // 성공하면
                     $(".search-area").toggleClass("search-active")
                     $('#challenge-list').empty();
-                    let challenges = response['challenges']
-                    showChallenges(challenges)
+                    showChallenges(response)
                 }
             })
         }
@@ -298,23 +321,27 @@
 <!-- products -->
 <div class="product-section mt-150 mb-150">
     <div class="container" style="text-align: center">
-        <div id="no_challenge" style="display: none">
-            <img src="./static/assets/img/error.svg" width="300" height="300"
-                 alt="">
-            <h4 style="margin-top: 30px">챌린지가 없습니다😥</h4>
-        </div>
 
         <div class="row" id="container__category">
             <div class="col-md-12">
                 <div class="product-filters">
                     <ul>
-                        <li class="active" data-filter="*">All</li>
-                        <li data-filter=".category1">운동</li>
-                        <li data-filter=".category2">공부</li>
-                        <li data-filter=".category3">취미</li>
+                        <input type="button" id="All" name="button" value="All" class="btn btn-outline-light"/>
+                        <input type="button" id="운동" name="button" value="운동" class="btn btn-outline-light"/>
+                        <input type="button" id="공부" name="button" value="공부" class="btn btn-outline-light"/>
+                        <input type="button" id="취미" name="button" value="취미" class="btn btn-outline-light"/>
+                        <!--                        <li class="active" data-filter="*">All</li>-->
+                        <!--                        <li data-filter=".category1">운동</li>-->
+                        <!--                        <li data-filter=".category2">공부</li>-->
+                        <!--                        <li data-filter=".category3">취미</li>-->
                     </ul>
                 </div>
             </div>
+        </div>
+        <div id="no_challenge" style="display: none">
+            <img src="./static/assets/img/error.svg" width="300" height="300"
+                 alt="">
+            <h4 style="margin-top: 30px">챌린지가 없습니다😥</h4>
         </div>
 
         <div class="row product-lists" id="challenge-list">
