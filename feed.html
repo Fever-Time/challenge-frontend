@@ -231,6 +231,11 @@
             width: auto;
             line-height: 40px;
         }
+        #comment-text {
+            text-align: center;
+            height: 50px;
+        }
+
     </style>
 
     <script>
@@ -244,14 +249,48 @@
                 url: "http://localhost:8080/feeds",
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
+                    console.log(response)
                     for (let i = 0; i < response.length; i++) {
-                        makeListPost(response[i]);
+                        console.log("feedId = ", response[i]['feedId']);
+                        let feedId = response[i]['feedId'];
+                        makeListPost(response[i], feedId);
+                        getComments(feedId);
                     }
                 }
             })
         }
 
-        function makeListPost(feed) {
+        function getComments(feedId) { // 789
+            $.ajax({
+                type: "GET",
+                url: `http://localhost:8080/feeds/${feedId}/comments`,
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    console.log("comment = ",response)
+                    for (let i = 0; i < response.length; i++) {
+                        console.log("response = ", response)
+                        console.log("feedId = ", response[i]['feedId']);
+                        makeListComment(response[i], feedId);
+                    }
+                }
+            })
+        }
+
+        function makeListComment(comment, feedId) {
+            let tempHtml = `
+                                <div class="alert alert-light" role="alert">
+                                    <div class="text" style="display: flex;">
+                                        <b>${comment['username']}</b>&nbsp;&nbsp; ${comment['contents']}
+                                    </div>
+                                </div>
+
+                            `
+            $(`#${feedId}-comment-area`).append(tempHtml);
+        }
+
+
+
+        function makeListPost(feed, feedId) {
             let tempHtml = `
                         <div class="card">
                             <!-- date/username 영역 -->
@@ -276,11 +315,26 @@
                                 <img class="icon-delete" src="static/assets/img/delete.png" alt="">
                                 <img class="icon-end-edit" src="static/assets/img/done.png" alt="">
                             </div>
+                            <hr>
+                            <div id="${feedId}-comment-area">
+
+                            </div>
+
+                            <div class="input-group mb-3" style="margin:auto;height: 36px;width: 500px;">
+                                <input type="text" class="form-control commenet" placeholder="댓글을 입력하세요"
+                                       aria-label="Recipient's username" aria-describedby="basic-addon2" id='${feedId}-comment-val'>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary comment2" type="button" onclick="writeComment(${feedId})">입력</button>
+                                </div>
+                            </div>
                         </div>
 
                     `;
             $("#cards-box").append(tempHtml);
         }
+
+
+
 
 
         function writePost() {
@@ -297,8 +351,33 @@
                 success: function (response) {
                     alert("피드 등록 완료 !");
                     window.location.reload();
+
                 }
             })
+        }
+
+        function writeComment(feedId) { // 123
+            let comment = {"contents": $(`#${feedId}-comment-val`).val()}
+
+            console.log("comment = ", comment);
+            console.log("feedId test", feedId);
+
+            $.ajax({
+                type: "POST",
+                url: `http://localhost:8080/feeds/${feedId}/comments`,
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(comment),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    alert("댓글 등록 완료 !");
+                    window.location.reload();
+                }
+            })
+
+
+
         }
 
     </script>
@@ -437,44 +516,7 @@
             </div>
             <!--   피드 입력시 이 부분 반복   5432     -->
             <div id="cards-box" class="area-read">
-                <div class="card">
-                    <!-- date/username 영역 -->
-                    <div class="metadata">
-                        <div class="date">
-                            ${feed['lastModifiedDate']}
-                        </div>
-                        <div class="username">
-                            ${feed['username']}
-                        </div>
-                    </div>
-                    <!-- contents 조회/수정 영역-->
-                    <div class="contents">
-                        <div class="text">
-                            ${feed['contents']}
-                        </div>
 
-                    </div>
-                    <!-- 버튼 영역-->
-                    <div class="footer">
-                        <img class="icon-start-edit" src="static/assets/img/edit.png" alt="">
-                        <img class="icon-delete" src="static/assets/img/delete.png" alt="">
-                        <img class="icon-end-edit" src="static/assets/img/done.png" alt="">
-                    </div>
-                    <hr>
-                    <div class="alert alert-light" role="alert">
-                        <div class="text" style="float: left;padding-left: 5px">
-                            <b>수빈</b>&nbsp;&nbsp;이제 괜찮은거같아여..
-                        </div>
-                    </div>
-                    <div class="input-group mb-3" style="margin:auto;height: 36px;width: 500px;">
-                        <input type="text" class="form-control commenet" placeholder="댓글을 입력하세요"
-                               aria-label="Recipient's username" aria-describedby="basic-addon2">
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary comment2" type="button">입력
-                            </button>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         </div>
