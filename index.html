@@ -131,7 +131,8 @@
                 $('#challenge-list').empty()
                 return
             }
-            $('#challenge-list').empty()
+            $('#no_challenge').hide();
+            $('#challenge-list').empty();
 
             for (let i = 0; i < challenges.length; i++) {
                 let id = challenges[i]['challengeId'];
