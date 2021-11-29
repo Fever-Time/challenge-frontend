@@ -265,8 +265,6 @@
                 success: function (response) {
                     console.log("comment = ", response)
                     for (let i = 0; i < response.length; i++) {
-                        console.log("response = ", response)
-                        console.log("feedId = ", response[i]['feedId']);
                         makeListComment(response[i], feedId);
                     }
                 }
@@ -299,17 +297,18 @@
                                 </div>
                             </div>
                             <!-- contents 조회/수정 영역    456456-->
-                            <div id="feed-val">
-                                <h6>${feed['contents']}</h6>
+                            <div id="${feed['feedId']}-feed-val">
+                                <h6 id="${feed['feedId']}-feedValue">${feed['contents']}</h6>
                             </div>
 
 
 
                             <!-- 버튼 영역-->
                             <div class="footer">
-                                <img class="icon-start-edit" src="static/assets/img/edit.png" alt="" ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#feedModal">
-                                  Launch demo modal
-                                </button>
+
+                                <div data-toggle="modal" onclick="openModal(${feed['feedId']})" >
+                                  <img class="icon-start-edit" src="static/assets/img/edit.png" alt=""> </div>
+
 
                                 <img class="icon-delete" src="static/assets/img/delete.png" alt="" onclick="deleteFeed(${feed['kakaoId']}, ${feed['feedId']})">
                                 <img class="icon-end-edit" src="static/assets/img/done.png" alt="">
@@ -331,33 +330,30 @@
 
                             <!-- feed modal area-->
                             <div id="feedModalpage">
-                                <div class="modal fade" id="feedModal" tabindex="-1" role="dialog" aria-labelledby="feedModalLabel" aria-hidden="true">
+                                <div class="modal fade" id="${feed['feedId']}feedModal" tabindex="-1" role="dialog" aria-labelledby="${feed['feedId']}-feedModalLabel" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="feedModalLabel">Modal title</h5>
+                                                <h5 class="modal-title" id="${feed['feedId']}-feedModalLabel">피드 수정</h5>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
                                             <div class="modal-body">
-                                                <input type="text" style="width: 100%" id='${feed['feedId']}-feed-edit-value'>
+                                                <input type="text" style="width: 100%" id='${feed['feedId']}-feed-edit-value' value="${feed['contents']}">
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary" onclick="editFeed(${feed['kakaoId']}, ${feed['feedId']})">Save changes</button>
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                                                <button type="button" class="btn btn-primary" onclick="editFeed(${feed['kakaoId']}, ${feed['feedId']})">수정하기</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-
                     `;
             $("#cards-box").append(tempHtml);
         }
-
 
         function writePost() {
             let content = {"contents": $('#contents').val()}
@@ -371,14 +367,14 @@
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
                 success: function (response) {
-                    alert("피드 등록 완료 !");
+                    alert("피드 등록 완료 !!");
                     window.location.reload();
 
                 }
             })
         }
 
-        function writeComment(feedId) { // 123
+        function writeComment(feedId) {
             let comment = {"contents": $(`#${feedId}-comment-val`).val()}
 
             console.log("comment = ", comment);
@@ -393,7 +389,7 @@
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
                 success: function (response) {
-                    alert("댓글 등록 완료 !");
+                    alert("댓글 등록 완료 !!");
                     window.location.reload();
                 }
             })
@@ -406,16 +402,22 @@
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
-                success: function (response) { // 성공하면
-                    alert("피드 삭제 완료!");
+                success: function (response) {
+                    alert("피드 삭제 완료 !!");
                     window.location.reload();
                 }
             })
         }
 
+        function openModal(feedId) {
+            $(`#${feedId}feedModal`).modal('show'); // 모달이 띄워진다.
+            let feedText = $(`#${feedId}-feed-val`).text(); // 피드에 입력된 값 -> 나중에 모달 기본값 설정할 때 사용
+
+        }
+
         function editFeed(kakaoId, feedId) {
             let content = {"contents": $(`#${feedId}-feed-edit-value`).val()}
-            console.log("feedId = ", feedId);
+
             $.ajax({
                 type: "PUT",
                 url: `http://localhost:8080/feeds/${feedId}`,
@@ -425,7 +427,7 @@
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
                 success: function (response) { // 성공하면
-                    alert("피드 수정 완료!");
+                    alert("피드 수정 완료 !!");
                     window.location.reload();
                 }
             })
@@ -496,30 +498,6 @@
     </div>
 </div>
 <!-- header end -->
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Login</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <img onclick="loginWithKakao()" style="cursor:pointer;"
-                     src="static/assets/img/kakao_login_large_wide.png" alt="카카오 로그인"/>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Feed Edit Modal 5566-->
 
 
 <!-- search area start-->
