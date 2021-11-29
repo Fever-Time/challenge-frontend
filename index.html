@@ -126,8 +126,9 @@
 
         function showChallenges(challenges) {
             if (challenges.length == 0) {
-                $('#container__category').hide()
+                // $('#container__category').hide()
                 $('#no_challenge').show()
+                $('#challenge-list').empty()
                 return
             }
             $('#challenge-list').empty()
@@ -321,11 +322,6 @@
 <!-- products -->
 <div class="product-section mt-150 mb-150">
     <div class="container" style="text-align: center">
-        <div id="no_challenge" style="display: none">
-            <img src="./static/assets/img/error.svg" width="300" height="300"
-                 alt="">
-            <h4 style="margin-top: 30px">챌린지가 없습니다😥</h4>
-        </div>
 
         <div class="row" id="container__category">
             <div class="col-md-12">
@@ -342,6 +338,11 @@
                     </ul>
                 </div>
             </div>
+        </div>
+        <div id="no_challenge" style="display: none">
+            <img src="./static/assets/img/error.svg" width="300" height="300"
+                 alt="">
+            <h4 style="margin-top: 30px">챌린지가 없습니다😥</h4>
         </div>
 
         <div class="row product-lists" id="challenge-list">
