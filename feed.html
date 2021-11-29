@@ -208,6 +208,29 @@
         #cards-box {
             margin-top: 12px;
         }
+
+        .commenet {
+            border-top-left-radius: 22px;
+            border-bottom-left-radius: 22px;
+            height: 36px;
+        }
+
+        .comment2 {
+            border-top-right-radius: 22px;
+            border-bottom-right-radius: 22px;
+        }
+
+        .alert-light {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            background-color: whitesmoke;
+            margin-left: 20px;
+            margin-right: auto;
+            border-radius: 30px;
+            height: auto;
+            width: auto;
+            line-height: 40px;
+        }
     </style>
 
     <script>
@@ -414,6 +437,44 @@
             </div>
             <!--   피드 입력시 이 부분 반복   5432     -->
             <div id="cards-box" class="area-read">
+                <div class="card">
+                    <!-- date/username 영역 -->
+                    <div class="metadata">
+                        <div class="date">
+                            ${feed['lastModifiedDate']}
+                        </div>
+                        <div class="username">
+                            ${feed['username']}
+                        </div>
+                    </div>
+                    <!-- contents 조회/수정 영역-->
+                    <div class="contents">
+                        <div class="text">
+                            ${feed['contents']}
+                        </div>
+
+                    </div>
+                    <!-- 버튼 영역-->
+                    <div class="footer">
+                        <img class="icon-start-edit" src="static/assets/img/edit.png" alt="">
+                        <img class="icon-delete" src="static/assets/img/delete.png" alt="">
+                        <img class="icon-end-edit" src="static/assets/img/done.png" alt="">
+                    </div>
+                    <hr>
+                    <div class="alert alert-light" role="alert">
+                        <div class="text" style="float: left;padding-left: 5px">
+                            <b>수빈</b>&nbsp;&nbsp;이제 괜찮은거같아여..
+                        </div>
+                    </div>
+                    <div class="input-group mb-3" style="margin:auto;height: 36px;width: 500px;">
+                        <input type="text" class="form-control commenet" placeholder="댓글을 입력하세요"
+                               aria-label="Recipient's username" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary comment2" type="button">입력
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </div>
