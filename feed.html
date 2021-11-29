@@ -210,6 +210,76 @@
         }
     </style>
 
+    <script>
+        $(document).ready(function () {
+            getFeeds();
+        });
+
+        function getFeeds() {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/feeds",
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    for (let i = 0; i < response.length; i++) {
+                        makeListPost(response[i]);
+                    }
+                }
+            })
+        }
+
+        function makeListPost(feed) {
+            let tempHtml = `
+                        <div class="card">
+                            <!-- date/username 영역 -->
+                            <div class="metadata">
+                                <div class="date">
+                                    ${feed['lastModifiedDate']}
+                                </div>
+                                <div class="username">
+                                    ${feed['username']}
+                                </div>
+                            </div>
+                            <!-- contents 조회/수정 영역-->
+                            <div class="contents">
+                                <div class="text">
+                                    ${feed['contents']}
+                                </div>
+
+                            </div>
+                            <!-- 버튼 영역-->
+                            <div class="footer">
+                                <img class="icon-start-edit" src="static/assets/img/edit.png" alt="">
+                                <img class="icon-delete" src="static/assets/img/delete.png" alt="">
+                                <img class="icon-end-edit" src="static/assets/img/done.png" alt="">
+                            </div>
+                        </div>
+
+                    `;
+            $("#cards-box").append(tempHtml);
+        }
+
+
+        function writePost() {
+            let content = {"contents": $('#contents').val()}
+
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:8080/feeds",
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(content),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    alert("피드 등록 완료 !");
+                    window.location.reload();
+                }
+            })
+        }
+
+    </script>
+
 </head>
 <body style="background-color: lightgray;">
 
@@ -342,36 +412,9 @@
                 <!--            <button class="btn btn-danger" onclick="writePost()">작성하기</button>-->
                 <img src="static/assets/img/send.png" alt="" onclick="writePost()">
             </div>
+            <!--   피드 입력시 이 부분 반복   5432     -->
             <div id="cards-box" class="area-read">
-                <div class="card">
-                    <!-- date/username 영역 -->
-                    <div class="metadata">
-                        <div class="date">
-                            2020.01.01
-                        </div>
-                        <div id="${id}-username" class="username">
-                            아이디
-                        </div>
-                    </div>
-                    <!-- contents 조회/수정 영역-->
-                    <div class="contents">
-                        <div id="${id}-contents" class="text">
-                            내용
-                        </div>
-                        <div id="${id}-editarea" class="edit">
-                            <textarea id="${id}-textarea" class="te-edit" cols="30" rows="5"></textarea>
-                        </div>
-                    </div>
-                    <!-- 버튼 영역-->
-                    <div class="footer">
-                        <img id="${id}-edit" class="icon-start-edit" src="static/assets/img/edit.png" alt=""
-                             onclick="editPost('${id}')">
-                        <img id="${id}-delete" class="icon-delete" src="static/assets/img/delete.png" alt=""
-                             onclick="deleteOne('${id}')">
-                        <img id="${id}-submit" class="icon-end-edit" src="static/assets/img/done.png" alt=""
-                             onclick="submitEdit('${id}')">
-                    </div>
-                </div>
+
             </div>
         </div>
 
