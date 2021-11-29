@@ -92,14 +92,20 @@
         })
 
         function getChallenges() {
-            $.ajax({
-                type: "GET",
-                url: "http://localhost:8080/challenges",
-                data: {},
-                success: function (response) {
-                    showChallenges(response)
-                }
+            $("input:button[name='button']").on('click',function(){
+                let kind = $(this).val();
+                console.log(kind)
+                $.ajax({
+                    type: "GET",
+                    url: "http://localhost:8080/challenges",
+                    data: {"kind" : kind},
+                    success: function (response) {
+                        showChallenges(response)
+                        console.log(response)
+                    }
+                })
             })
+
         }
 
         function showChallenges(challenges) {
@@ -108,6 +114,7 @@
                 $('#no_challenge').show()
                 return
             }
+            $('#challenge-list').empty()
 
             for (let i = 0; i < challenges.length; i++) {
                 let id = challenges[i]['challengeId'];
@@ -116,7 +123,7 @@
                 let img = challenges[i]['image'];
                 let start = challenges[i]['startDate'];
                 let end = challenges[i]['endDate'];
-                let category = challenges[i]['categories'];
+                let category = challenges[i]['category']['name'];
                 // let status = challenges[i]['challenge_status'];
                 let limitPerson = challenges[i]['limitPerson'];
                 let participants = challenges[i]['participants']
@@ -308,10 +315,14 @@
             <div class="col-md-12">
                 <div class="product-filters">
                     <ul>
-                        <li class="active" data-filter="*">All</li>
-                        <li data-filter=".category1">운동</li>
-                        <li data-filter=".category2">공부</li>
-                        <li data-filter=".category3">취미</li>
+                        <input type="button" id="All" name="button" value="All"/>
+                        <input type="button" id="운동" name="button" value="운동"/>
+                        <input type="button" id="공부" name="button" value="공부"/>
+                        <input type="button" id="취미" name="button" value="취미"/>
+<!--                        <li class="active" data-filter="*">All</li>-->
+<!--                        <li data-filter=".category1">운동</li>-->
+<!--                        <li data-filter=".category2">공부</li>-->
+<!--                        <li data-filter=".category3">취미</li>-->
                     </ul>
                 </div>
             </div>

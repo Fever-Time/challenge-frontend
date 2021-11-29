@@ -93,6 +93,10 @@
         }
 
         function createChallenge() {
+            let category = $("input[name='category']:checked").val();
+            // $("input[name='category']:checked").each(function (e) {
+            //     category.push($(this).val())
+            // })
 
             let title = $('#title').val()
             let desc = $("#desc").val()
@@ -129,7 +133,7 @@
             form_data.append("startDate", startDate)
             form_data.append("endDate", endDate)
             form_data.append("address_give", address)
-            form_data.append("category", "운동")
+            form_data.append("category", category)
             form_data.append("limitPerson", limitPerson)
 
             $.ajax({
@@ -337,19 +341,19 @@
 
 
                         <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-                            <input type="checkbox" name="category" value="category1" class="btn-check" id="category1"
+                            <input type="checkbox" name="category" value="운동" class="btn-check" id="category1"
                                    autocomplete="off">
                             <label onclick="onclickCheckboxHandler(this)"
                                    class="checkbox-check btn btn-outline-primary"
                                    for="category1">운동</label>
 
-                            <input type="checkbox" name="category" value="category2" class="btn-check" id="category2"
+                            <input type="checkbox" name="category" value="공부" class="btn-check" id="category2"
                                    autocomplete="off">
                             <label onclick="onclickCheckboxHandler(this)"
                                    class="checkbox-check btn btn-outline-primary"
                                    for="category2">공부</label>
 
-                            <input type="checkbox" name="category" value="category3" class="btn-check" id="category3"
+                            <input type="checkbox" name="category" value="취미" class="btn-check" id="category3"
                                    autocomplete="off">
                             <label onclick="onclickCheckboxHandler(this)"
                                    class="checkbox-check btn btn-outline-primary"
