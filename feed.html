@@ -231,16 +231,12 @@
             width: auto;
             line-height: 40px;
         }
-        #comment-text {
-            text-align: center;
-            height: 50px;
-        }
-
     </style>
 
     <script>
         $(document).ready(function () {
             getFeeds();
+
         });
 
         function getFeeds() {
@@ -252,9 +248,10 @@
                     console.log(response)
                     for (let i = 0; i < response.length; i++) {
                         console.log("feedId = ", response[i]['feedId']);
-                        let feedId = response[i]['feedId'];
-                        makeListPost(response[i], feedId);
-                        getComments(feedId);
+
+                        //복구 지점 1
+                        makeListPost(response[i]);
+                        getComments(response[i]['feedId']);
                     }
                 }
             })
@@ -266,7 +263,7 @@
                 url: `http://localhost:8080/feeds/${feedId}/comments`,
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
-                    console.log("comment = ",response)
+                    console.log("comment = ", response)
                     for (let i = 0; i < response.length; i++) {
                         console.log("response = ", response)
                         console.log("feedId = ", response[i]['feedId']);
@@ -283,14 +280,13 @@
                                         <b>${comment['username']}</b>&nbsp;&nbsp; ${comment['contents']}
                                     </div>
                                 </div>
-
                             `
             $(`#${feedId}-comment-area`).append(tempHtml);
         }
 
 
+        function makeListPost(feed) {
 
-        function makeListPost(feed, feedId) {
             let tempHtml = `
                         <div class="card">
                             <!-- date/username 영역 -->
@@ -302,39 +298,65 @@
                                     ${feed['username']}
                                 </div>
                             </div>
-                            <!-- contents 조회/수정 영역-->
-                            <div class="contents">
-                                <div class="text">
-                                    ${feed['contents']}
-                                </div>
-
+                            <!-- contents 조회/수정 영역    456456-->
+                            <div id="feed-val">
+                                <h6>${feed['contents']}</h6>
                             </div>
+
+
+
                             <!-- 버튼 영역-->
                             <div class="footer">
-                                <img class="icon-start-edit" src="static/assets/img/edit.png" alt="">
-                                <img class="icon-delete" src="static/assets/img/delete.png" alt="">
+                                <img class="icon-start-edit" src="static/assets/img/edit.png" alt="" ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#feedModal">
+                                  Launch demo modal
+                                </button>
+
+                                <img class="icon-delete" src="static/assets/img/delete.png" alt="" onclick="deleteFeed(${feed['kakaoId']}, ${feed['feedId']})">
                                 <img class="icon-end-edit" src="static/assets/img/done.png" alt="">
                             </div>
                             <hr>
-                            <div id="${feedId}-comment-area">
+                            <!--         피드에 등록되는 댓글 리스트 영역        -->
+                            <div id="${feed['feedId']}-comment-area">
 
                             </div>
 
                             <div class="input-group mb-3" style="margin:auto;height: 36px;width: 500px;">
                                 <input type="text" class="form-control commenet" placeholder="댓글을 입력하세요"
-                                       aria-label="Recipient's username" aria-describedby="basic-addon2" id='${feedId}-comment-val'>
+                                       aria-label="Recipient's username" aria-describedby="basic-addon2" id='${feed['feedId']}-comment-val'>
                                 <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary comment2" type="button" onclick="writeComment(${feedId})">입력</button>
+                                    <button class="btn btn-outline-secondary comment2" type="button" onclick="writeComment(${feed['feedId']})">입력</button>
                                 </div>
                             </div>
+
+
+                            <!-- feed modal area-->
+                            <div id="feedModalpage">
+                                <div class="modal fade" id="feedModal" tabindex="-1" role="dialog" aria-labelledby="feedModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="feedModalLabel">Modal title</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="text" style="width: 100%" id='${feed['feedId']}-feed-edit-value'>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-primary" onclick="editFeed(${feed['kakaoId']}, ${feed['feedId']})">Save changes</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
 
                     `;
             $("#cards-box").append(tempHtml);
         }
-
-
-
 
 
         function writePost() {
@@ -375,9 +397,38 @@
                     window.location.reload();
                 }
             })
+        }
 
+        function deleteFeed(kakaoId, feedId) {
+            $.ajax({
+                type: "DELETE",
+                url: `http://localhost:8080/feeds/${feedId}`,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) { // 성공하면
+                    alert("피드 삭제 완료!");
+                    window.location.reload();
+                }
+            })
+        }
 
-
+        function editFeed(kakaoId, feedId) {
+            let content = {"contents": $(`#${feedId}-feed-edit-value`).val()}
+            console.log("feedId = ", feedId);
+            $.ajax({
+                type: "PUT",
+                url: `http://localhost:8080/feeds/${feedId}`,
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(content),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) { // 성공하면
+                    alert("피드 수정 완료!");
+                    window.location.reload();
+                }
+            })
         }
 
     </script>
@@ -467,6 +518,9 @@
         </div>
     </div>
 </div>
+
+<!-- Feed Edit Modal 5566-->
+
 
 <!-- search area start-->
 <div class="search-area">
