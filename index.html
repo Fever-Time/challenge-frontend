@@ -113,7 +113,7 @@
             console.log(kind)
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8080/challenges",
+                url: "https://api.fevertime.shop/challenges",
                 data: {"kind": kind},
                 success: function (response) {
                     showChallenges(response)
@@ -188,7 +188,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8080/challenges/search",
+                url: "https://api.fevertime.shop/challenges/search",
                 data: {"search": search},
                 success: function (response) { // 성공하면
                     $(".search-area").toggleClass("search-active")

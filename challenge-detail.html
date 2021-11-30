@@ -194,7 +194,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "http://localhost:8080/certifications",
+                url: "https://api.fevertime.shop/certifications",
                 data: form_data,
                 cache: false,
                 contentType: false,
@@ -212,7 +212,7 @@
         function getCertification() {
             $.ajax({
                 type: "GET",
-                url: `http://localhost:8080/challenges/${CHALLENGE_ID}/certifications`,
+                url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}/certifications`,
                 data: {},
                 success: function (certifications) {
                     showCertification(certifications);
@@ -223,7 +223,7 @@
         function getChallenge() {
             $.ajax({
                 type: "GET",
-                url: `http://localhost:8080/challenges/${CHALLENGE_ID}`,
+                url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}`,
                 data: {},
                 success: function (response) {
                     let challenge = response;
