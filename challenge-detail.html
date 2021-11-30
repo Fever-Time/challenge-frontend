@@ -157,20 +157,16 @@
         a.btnp {
             background-color: #4e555b;
         }
-
     </style>
-
     <script>
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
         const CHALLENGE_ID = urlParams.get('challengeId')
-        console.log(CHALLENGE_ID)
-
-        let G_CHALLENGE_STATUS
 
         $(document).ready(function () {
             bsCustomFileInput.init();
             getChallenge();
+            getCertification();
         })
 
         function onClickJoinBtnHandler() {
@@ -213,23 +209,27 @@
             });
         }
 
+        function getCertification() {
+            $.ajax({
+                type: "GET",
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}/certifications`,
+                data: {},
+                success: function (certifications) {
+                    showCertification(certifications);
+                }
+            })
+        }
+
         function getChallenge() {
             $.ajax({
                 type: "GET",
                 url: `http://localhost:8080/challenges/${CHALLENGE_ID}`,
                 data: {},
                 success: function (response) {
-                    console.log(response)
                     let challenge = response;
-                    let certifications = response['certifications'];
 
-                    // let related_challenge = response['related_challenge'];
-                    // let status = response['status'];
-                    // let status_join = response['status_join'];
-                    // G_CHALLENGE_STATUS = challenge['challenge_status']
                     showDetail(challenge)
                     checkChallenge(challenge)
-                    showCheck(certifications);
                     showMap(challenge);
                     // showRelated(related_challenge);
                 }
@@ -256,7 +256,6 @@
                 $("#check-challenge").append(temp_html);
             }
         }
-
 
         // 챌린지 기본 정보 보여주기
         function showDetail(challenge) {
@@ -303,7 +302,7 @@
 
 
         // 인증 가져오기
-        function showCheck(certifications) {
+        function showCertification(certifications) {
             for (let i = 0; i < certifications.length; i++) {
                 let temp_html = `<div class="card-check">
                                     <div class="card-header">

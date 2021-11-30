@@ -87,7 +87,6 @@
             border: solid white;
             color: white;
         }
-
     </style>
     <script>
         $(document).ready(function () {
@@ -137,11 +136,11 @@
             for (let i = 0; i < challenges.length; i++) {
                 let id = challenges[i]['challengeId'];
                 let title = challenges[i]['title'];
-                let desc = challenges[i]['description'];
+                // let desc = challenges[i]['description'];
                 let img = challenges[i]['image'];
                 let start = challenges[i]['startDate'];
                 let end = challenges[i]['endDate'];
-                let category = challenges[i]['category']['name'];
+                // let category = challenges[i]['category']['name'];
                 // let status = challenges[i]['challenge_status'];
                 let limitPerson = challenges[i]['limitPerson'];
                 let participants = challenges[i]['participants']
@@ -189,7 +188,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8080/search",
+                url: "http://localhost:8080/challenges/search",
                 data: {"search": search},
                 success: function (response) { // 성공하면
                     $(".search-area").toggleClass("search-active")
