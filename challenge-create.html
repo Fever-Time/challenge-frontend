@@ -93,29 +93,21 @@
         }
 
         function createChallenge() {
-            let categories = [];
-            $("input[name='category']:checked").each(function (e) {
-                categories.push($(this).val())
-            })
+            let category = $("input[name='category']:checked").val();
+            // $("input[name='category']:checked").each(function (e) {
+            //     category.push($(this).val())
+            // })
 
             let title = $('#title').val()
             let desc = $("#desc").val()
-            let period = [document.querySelector('#start-period').value, document.querySelector('#end-period').value]
+            let startDate = document.querySelector('#start-period').value
+            let endDate = document.querySelector('#end-period').value
             let image = $('#formFile')[0].files[0]
             let address = $('#sample5_address').val()
-            let max = $("#max-people").val();
+            let limitPerson = $("#max-people").val();
             if (address == "") {
                 address = "online";
             }
-
-            let form_data = new FormData()
-            form_data.append("image_give", image)
-            form_data.append("title_give", title)
-            form_data.append("desc_give", desc)
-            form_data.append("period_give", period)
-            form_data.append("address_give", address)
-            form_data.append("categories_give", categories)
-            form_data.append("max_give", max)
 
             if (title == "") {
                 alert('챌린지 이름을 입력하세요')
@@ -123,24 +115,39 @@
             } else if (desc == "") {
                 alert('상세 내용을 입력하세요')
                 return $('#desc').focus();
-            } else if (period[0] == "" || period[1] == "") {
+            } else if (startDate == "") {
                 alert('진행 기간을 입력하세요')
-                return $('#desc').focus();
-            } else if (max < 1 || max > 100) {
+                return $('#start-period').focus();
+            } else if (endDate == "") {
+                alert('진행 기간을 입력하세요')
+                return $('#end-period').focus();
+            } else if (limitPerson < 1 || limitPerson > 100) {
                 alert("1~100명 범위로 입력해 주십시오.");
                 return $('#max-people').focus();
             }
 
+            let form_data = new FormData()
+            form_data.append("image", image)
+            form_data.append("title", title)
+            form_data.append("description", desc)
+            form_data.append("startDate", startDate)
+            form_data.append("endDate", endDate)
+            form_data.append("address_give", address)
+            form_data.append("category", category)
+            form_data.append("limitPerson", limitPerson)
+
             $.ajax({
                 type: "POST",
-                url: "/challenge",
+                url: "https://api.fevertime.shop/challenges",
                 data: form_data,
                 cache: false,
                 contentType: false,
                 processData: false,
-
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
                 success: function (response) { // 성공하면
-                    alert(response["msg"]);
+                    alert(response);
                     window.location.href = 'index.html'
                 }
             })
@@ -187,6 +194,11 @@
             document.getElementById("end-period").setAttribute("min", today);
             document.getElementById("start-period").setAttribute("min", today);
         }
+
+        function logout() {
+            localStorage.removeItem("token");
+            location.href = "index.html";
+        }
     </script>
 </head>
 <body>
@@ -205,7 +217,7 @@
             <div class="col-lg-12 col-sm-12 text-center">
                 <div class="main-menu-wrap">
                     <!-- logo -->
-                    <div class="site-logo">
+                    <div class="site-logo" style="padding: 0;">
                         <a href="index.html">
                             <img src="./static/assets/img/logo.png" alt="">
                         </a>
@@ -215,21 +227,31 @@
                     <!-- menu start -->
                     <nav class="main-menu">
                         <ul>
+                            <li class="current-list-item">
+                                <a href="index.html">Home</a>
+                            </li>
+                            <li>
+                                <a href="feed.html">Feed</a>
+                            </li>
+                            <li>
+                                <a href="#">User</a>
+                                <ul class="sub-menu">
+                                    <li><a href="user.html">My Page</a></li>
+                                    <li><a href="#" onclick="logout()">Logout</a></li>
+                                </ul>
+                            </li>
+
                             <li>
                                 <div class="header-icons">
-                                    <a class="mobile-hide search-bar-icon" href="#"><i
-                                            class="fas fa-search"></i></a>
-                                    <a class="shopping-cart" href="user.html"><i class="fas fa-user"></i></a>
+                                    <a class="shopping-cart" href="#">
+                                        1000 <i class="fab fa-bitcoin"></i>
+                                    </a>
                                 </div>
                             </li>
                         </ul>
                     </nav>
 
-                    <div class="nav-mobile-show-container">
-                        <a class="mobile-show search-bar-icon" style="right: 100px;" href="#"><i
-                                class="fas fa-search"></i></a>
-                        <a class="mobile-show search-bar-icon" href="user.html"><i class="fas fa-user"></i></a>
-                    </div>
+                    <div class="mobile-menu"></div>
                     <!-- menu end -->
                 </div>
             </div>
@@ -319,19 +341,19 @@
 
 
                         <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-                            <input type="checkbox" name="category" value="category1" class="btn-check" id="category1"
+                            <input type="checkbox" name="category" value="운동" class="btn-check" id="category1"
                                    autocomplete="off">
                             <label onclick="onclickCheckboxHandler(this)"
                                    class="checkbox-check btn btn-outline-primary"
                                    for="category1">운동</label>
 
-                            <input type="checkbox" name="category" value="category2" class="btn-check" id="category2"
+                            <input type="checkbox" name="category" value="공부" class="btn-check" id="category2"
                                    autocomplete="off">
                             <label onclick="onclickCheckboxHandler(this)"
                                    class="checkbox-check btn btn-outline-primary"
                                    for="category2">공부</label>
 
-                            <input type="checkbox" name="category" value="category3" class="btn-check" id="category3"
+                            <input type="checkbox" name="category" value="취미" class="btn-check" id="category3"
                                    autocomplete="off">
                             <label onclick="onclickCheckboxHandler(this)"
                                    class="checkbox-check btn btn-outline-primary"
