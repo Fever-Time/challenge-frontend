@@ -104,10 +104,8 @@
             let endDate = document.querySelector('#end-period').value
             let image = $('#formFile')[0].files[0]
             let address = $('#sample5_address').val()
+            let locationType = $('input[name="addType"]:checked').val();
             let limitPerson = $("#max-people").val();
-            if (address == "") {
-                address = "online";
-            }
 
             if (title == "") {
                 alert('챌린지 이름을 입력하세요')
@@ -126,14 +124,20 @@
                 return $('#max-people').focus();
             }
 
+            if (locationType == "OFFLINE" && $('#sample5_address').val() == "") {
+                alert("오프라인 장소를 입력해주세요.")
+                return $('#sample5_address').focus();
+            }
+
             let form_data = new FormData()
             form_data.append("image", image)
             form_data.append("title", title)
             form_data.append("description", desc)
             form_data.append("startDate", startDate)
             form_data.append("endDate", endDate)
-            form_data.append("address_give", address)
+            form_data.append("address", address)
             form_data.append("category", category)
+            form_data.append("locationType", locationType)
             form_data.append("limitPerson", limitPerson)
 
             $.ajax({
@@ -364,14 +368,14 @@
 
                         <div id="radio-container">
                             <div class="form-check">
-                                <input class="form-check-input" name="addType" type="radio" id="online"
+                                <input class="form-check-input" name="addType" type="radio" value="ONLINE" id="online"
                                        checked onchange="onChangeAddressRadio()">
                                 <label class="form-check-label" for="online">
                                     온라인
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" name="addType" type="radio" id="offline"
+                                <input class="form-check-input" name="addType" type="radio" value="OFFLINE" id="offline"
                                        onchange="onChangeAddressRadio()">
                                 <label class="form-check-label" for="offline">
                                     오프라인
