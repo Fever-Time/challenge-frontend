@@ -227,7 +227,6 @@
                 data: {},
                 success: function (response) {
                     let challenge = response;
-
                     showDetail(challenge)
                     checkChallenge(challenge)
                     showMap(challenge);
@@ -261,7 +260,7 @@
         function showDetail(challenge) {
             let temp_html = `<div class="col-md-5">
                                 <div class="single-product-img">
-                                    <img src="${challenge['image']}" alt="">
+                                    <img src="${challenge['imgLink']}" alt="">
                                 </div>
                             </div>
                             <div class="col-md-7">
@@ -306,7 +305,7 @@
             for (let i = 0; i < certifications.length; i++) {
                 let temp_html = `<div class="card-check">
                                     <div class="card-header">
-                                        <img src="${certifications[i]['img']}" alt=""/>
+                                        <img src="${certifications[i]['imgLink']}" alt=""/>
                                     </div>
                                     <div class="card-mid">
                                         <h5 class="join_title">${certifications[i]['contents']}</h5>
@@ -325,50 +324,10 @@
 
         // 지도 보여주기
         function showMap(challenge) {
-            if (challenge['challenge_address'] !== 'online') {
-                let temp_html = `<div class="container">
-                                    <div class="row">
-                                        <div class="col-lg-8 offset-lg-2 text-center">
-                                            <div class="section-title">
-                                                <h3><span class="orange-text"></span> 장소</h3>
-
-                                                <div id="map" style="width:100%;height:350px;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>`;
-
-                $("#map").append(temp_html);
-            }
-        }
-
-        // 카테고리 같은 연관 챌린지 보여주기
-        function showRelated(related) {
-            for (let i = 0; i < related.length; i++) {
-                if (related[i]['challenge_status'] === 0 && related[i]['challenge_max'] !== related[i]['people']) {
-                    let temp_html = `<div class="col-lg-4 col-md-6 text-center">
-                                        <div class="single-product-item">
-                                            <div class="product-image">
-                                                <a href="challenge-datail.html/detail?challenge_id=${related[i]['_id']}">
-                                                <img src="https://dybzsbdm9g4zq.cloudfront.net/${related[i]['challenge_img']}"
-                                                alt=""
-                                                class="related-challenge-img">
-                                                </a>
-                                            </div>
-                                            <h3>${related[i]['challenge_title']}</h3>
-                                            <p class="product-price">
-                                                <span>
-                                                    <i class="far fa-calendar-alt"></i> ${related[i]['challenge_startTime']} ~ ${related[i]['challenge_endTime']}
-                                                </span>
-                                                ${related[i]['people']}명 참가
-                                            </p>
-                                            <a href="challenge-datail.html/detail?challenge_id=${related[i]['_id']}" class="cart-btn">
-                                                <i class="fas fa-bolt"></i> Go to Challenge
-                                            </a>
-                                        </div>
-                                    </div>`
-                    $("#related").append(temp_html);
-                }
+            if (challenge['locationType'] !== 'ONLINE') {
+                createMap(`${challenge['address']}`)
+            } else {
+                $('#map-container').hide()
             }
         }
     </script>
@@ -493,51 +452,6 @@
 <div class="single-product mt-150 mb-150">
     <div class="container">
         <div class="row" id="single-challenge">
-            <!--            <div class="col-md-5">-->
-            <!--                <div class="single-product-img">-->
-            <!--                    <img src="https://img.fevertime.shop/default-challenge-img.jfif"-->
-            <!--                         alt="">-->
-            <!--                </div>-->
-            <!--            </div>-->
-            <!--            <div class="col-md-7">-->
-            <!--                <div class="single-product-content">-->
-            <!--                    <h3>title</h3>-->
-            <!--                    <p class="single-product-pricing">-->
-            <!--                        <span>-->
-            <!--                            <i class="far fa-calendar-alt"></i> 2020.01.01 ~ 2020.02.02-->
-            <!--                        </span>-->
-            <!--                        4 / 10명-->
-            <!--                    </p>-->
-            <!--                    <p>describe</p>-->
-
-            <!--                    <div id="check-challenge">-->
-            <!--                        <a onclick="onClickJoinBtnHandler()" class="cart-btn">-->
-            <!--                            <i class="fas fa-bolt"></i>Go to Challenge-->
-            <!--                        </a>-->
-            <!--                        <a onclick="location.href='index.html'" class="cart-btn-h">-->
-            <!--                            <i class="fas fa-home"></i> Go to Main-->
-            <!--                        </a>-->
-            <!--                    </div>-->
-            <!--                    <p><strong>Categories: 공부 </strong></p>-->
-            <!--                    <div id="join-form-container" style="display: none;">-->
-            <!--                        <div class="input-group mb-3 join-form">-->
-            <!--                            <span for="formFile" class="input-group-text">챌린지 이미지</span>-->
-            <!--                            <input class="form-control" type="file" id="formFile">-->
-            <!--                        </div>-->
-
-            <!--                        <div class="input-group mb-3 join-form">-->
-            <!--                            <span for="formText" class="input-group-text">챌린지 후기</span>-->
-            <!--                            <input class="form-control" type="text" id="formText">-->
-            <!--                        </div>-->
-
-            <!--                        <a onclick="onClickCheck()" class="cart-btn-c">-->
-            <!--                            <i class="fa fa-check"></i>챌린지 인증-->
-            <!--                        </a>-->
-            <!--                    </div>-->
-            <!--                    <div id="pauseDelete" class="col-md-12 deleteBtn-container">-->
-            <!--                    </div>-->
-            <!--                </div>-->
-            <!--            </div>-->
 
             <div class="col-md-12 deleteBtn-container">
             </div>
@@ -547,6 +461,7 @@
 <!-- end single product -->
 
 <div class="card-group" id="card-group">
+
 </div>
 
 
@@ -593,37 +508,38 @@
 <script type="text/javascript"
         src="//dapi.kakao.com/v2/maps/sdk.js?appkey=7004ea44101be7c75067b28e563db611&libraries=services"></script>
 <script>
-    let mapContainer = document.getElementById('map'), // 지도를 표시할 div
-        mapOption = {
-            center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
-            level: 3 // 지도의 확대 레벨
-        };
+    function createMap(address) {
+        let mapContainer = document.getElementById('map'), // 지도를 표시할 div
+            mapOption = {
+                center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+                level: 3 // 지도의 확대 레벨
+            };
 
-    // 지도를 생성합니다
-    let map = new kakao.maps.Map(mapContainer, mapOption);
+        // 지도를 생성합니다
+        let map = new kakao.maps.Map(mapContainer, mapOption);
 
-    // 주소-좌표 변환 객체를 생성합니다
-    let geocoder = new kakao.maps.services.Geocoder();
+        // 주소-좌표 변환 객체를 생성합니다
+        let geocoder = new kakao.maps.services.Geocoder();
 
-    // 주소로 좌표를 검색합니다
-    geocoder.addressSearch(' ', function (result, status) {
+        // 주소로 좌표를 검색합니다
+        geocoder.addressSearch(address, function (result, status) {
 
-        // 정상적으로 검색이 완료됐으면
-        if (status === kakao.maps.services.Status.OK) {
+            // 정상적으로 검색이 완료됐으면
+            if (status === kakao.maps.services.Status.OK) {
 
-            let coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                let coords = new kakao.maps.LatLng(result[0].y, result[0].x);
 
-            // 결과값으로 받은 위치를 마커로 표시합니다
-            let marker = new kakao.maps.Marker({
-                map: map,
-                position: coords
-            });
+                // 결과값으로 받은 위치를 마커로 표시합니다
+                let marker = new kakao.maps.Marker({
+                    map: map,
+                    position: coords
+                });
 
-            // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
-            map.setCenter(coords);
-        }
-    })
-    ;
+                // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+                map.setCenter(coords);
+            }
+        })
+    }
 </script>
 
 <!-- bootstrap js start -->
