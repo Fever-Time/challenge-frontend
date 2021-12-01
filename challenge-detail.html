@@ -261,7 +261,7 @@
         function showDetail(challenge) {
             let temp_html = `<div class="col-md-5">
                                 <div class="single-product-img">
-                                    <img src="${challenge['image']}" alt="">
+                                    <img src="${challenge['imgLink']}" alt="">
                                 </div>
                             </div>
                             <div class="col-md-7">
@@ -306,7 +306,7 @@
             for (let i = 0; i < certifications.length; i++) {
                 let temp_html = `<div class="card-check">
                                     <div class="card-header">
-                                        <img src="${certifications[i]['img']}" alt=""/>
+                                        <img src="${certifications[i]['imgLink']}" alt=""/>
                                     </div>
                                     <div class="card-mid">
                                         <h5 class="join_title">${certifications[i]['contents']}</h5>
