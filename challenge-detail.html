@@ -167,7 +167,28 @@
             bsCustomFileInput.init();
             getChallenge();
             getCertification();
+
+            if (localStorage.getIem("token") != null) {
+                getUserChallengeHistory();
+            }
         })
+
+        function getUserChallengeHistory() {
+            $.ajax({
+                type: "GET",
+                url: "https://api.fevertime.shop/certifications",
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    alert("인증 되었습니다!")
+                    window.location.reload()
+                }
+            });
+        }
 
         function onClickJoinBtnHandler() {
             if (localStorage.getItem("token") == null) {
@@ -238,22 +259,30 @@
         //인원이 다 차면 모집종료 버튼으로 변경
         function checkChallenge(challenge) {
             if (challenge['participants'] === challenge['limitPerson']) {
-                let temp_html = `<a class="cart-btn btnp">
+                showEndBtn();
+            } else {
+                showJoinBtn();
+            }
+        }
+
+        function showJoinBtn() {
+            let temp_html = `<a onclick="onClickJoinBtnHandler()" class="cart-btn">
+                                    <i class="fas fa-bolt"></i>Join Challenge
+                                 </a>
+                                 <a onclick="location.href='index.html'" class="cart-btn-h">
+                                    <i class="fas fa-home"></i> Go to Main
+                                 </a>`
+            $("#check-challenge").append(temp_html);
+        }
+
+        function showEndBtn() {
+            let temp_html = `<a class="cart-btn btnp">
                                     <i class="fas fa-bolt"></i>모집 종료
                                  </a>
                                  <a onclick="location.href='index.html'" class="cart-btn-h">
                                     <i class="fas fa-home"></i> Go to Main
                                  </a>`
-                $("#check-challenge").append(temp_html);
-            } else {
-                let temp_html = `<a onclick="onClickJoinBtnHandler()" class="cart-btn">
-                                    <i class="fas fa-bolt"></i>Go to Challenge
-                                 </a>
-                                 <a onclick="location.href='index.html'" class="cart-btn-h">
-                                    <i class="fas fa-home"></i> Go to Main
-                                 </a>`
-                $("#check-challenge").append(temp_html);
-            }
+            $("#check-challenge").append(temp_html);
         }
 
         // 챌린지 기본 정보 보여주기
