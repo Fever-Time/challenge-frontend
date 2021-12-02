@@ -230,11 +230,12 @@
         .feed-val {
             height: auto;
             width: auto;
-            padding: 20px;
+            padding: 10px;
         }
 
-        .form-comment {
-
+        .writer {
+            padding: 15px;
+            text-align: left;
         }
     </style>
 
@@ -251,6 +252,7 @@
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
                     for (let i = 0; i < response.length; i++) {
+                        console.log(response[i])
                         //복구 지점 1
                         makeListPost(response[i]);
                         getComments(response[i]['feedId']);
@@ -288,6 +290,7 @@
 
         //해당 댓글에 수정 폼 보이기
         function editOpen(commentId, content) {
+            JSON.stringify()
             if ($(`#${commentId}-edit`).css("display") == "none") {
                 $(`#${commentId}-comment`).hide();
                 $(`#${commentId}-contents`).val(content);
@@ -296,6 +299,7 @@
                 $(`#${commentId}-comment`).show();
                 $(`#${commentId}-edit`).hide();
             }
+            console.log(localStorage.getItem('username'))
         }
 
         function editComment(commentId, feedId) {
@@ -317,7 +321,7 @@
         }
 
         function makeListComment(comment, feedId) {
-            let date = comment['lastModifiedDate'].replace("T", " ").substring(0, comment['lastModifiedDate'].indexOf("."));
+            let date = comment['lastModifiedDate'].replace("T", "  ").substring(0, comment['lastModifiedDate'].indexOf(".") - 2);
             let tempHtml = `
                                 <div class="alert alert-light" role="alert">
                                     <div style="text-align: left">
@@ -342,17 +346,14 @@
 
 
         function makeListPost(feed) {
-
+            let date = feed['lastModifiedDate'].replace("T", "  ").substring(0, feed['lastModifiedDate'].indexOf(".") - 2);
             let tempHtml = `
                         <div class="card">
                             <!-- date/username 영역 -->
-                            <div class="metadata">
-                                <div>
-                                    ${feed['lastModifiedDate']}
-                                </div>
-                                <div class="username">
-                                    ${feed['username']}
-                                </div>
+                            <div class="writer">
+                                <img src="${feed['imgLink']}" style="width: 60px; float: left; border-radius: 50px" hspace=10>
+                                <b style="font-size: medium">${feed['username']}</b>
+                                <h6 style="font-size: smaller">${date}</h6>
                             </div>
                             <!-- contents 조회/수정 영역    456456-->
                             <div id="${feed['feedId']}-feed-val" class="feed-val">
