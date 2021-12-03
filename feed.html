@@ -243,6 +243,15 @@
         $(document).ready(function () {
             getFeeds();
 
+            $.ajaxSetup({
+                error: function (jqXHR, exception) {
+                    switch (jqXHR.status) {
+                        case 401:
+                            alert('로그인 후 생성해주세요 !!');
+                            break;
+                    }
+                }
+            });
         });
 
         function getFeeds() {
@@ -290,7 +299,6 @@
 
         //해당 댓글에 수정 폼 보이기
         function editOpen(commentId, content) {
-            JSON.stringify()
             if ($(`#${commentId}-edit`).css("display") == "none") {
                 $(`#${commentId}-comment`).hide();
                 $(`#${commentId}-contents`).val(content);
@@ -342,76 +350,6 @@
                                 </div>
                             `
             $(`#${feedId}-comment-area`).append(tempHtml);
-        }
-
-
-        function makeListPost(feed) {
-            let date = feed['lastModifiedDate'].replace("T", "  ").substring(0, feed['lastModifiedDate'].indexOf(".") - 2);
-            let tempHtml = `
-                        <div class="card">
-                            <!-- date/username 영역 -->
-                            <div class="writer">
-                                <img src="${feed['imgLink']}" style="width: 60px; float: left; border-radius: 50px" hspace=10>
-                                <b style="font-size: medium">${feed['username']}</b>
-                                <h6 style="font-size: smaller">${date}</h6>
-                            </div>
-                            <!-- contents 조회/수정 영역    456456-->
-                            <div id="${feed['feedId']}-feed-val" class="feed-val">
-                                <h6 id="${feed['feedId']}-feedValue">${feed['contents']}</h6>
-                            </div>
-
-
-
-                            <!-- 버튼 영역-->
-                            <div class="footer">
-
-                                <div data-toggle="modal" onclick="openModal(${feed['feedId']})" >
-                                  <img class="icon-start-edit" src="static/assets/img/edit.png" alt=""> </div>
-
-
-                                <img class="icon-delete" src="static/assets/img/delete.png" alt="" onclick="deleteFeed(${feed['kakaoId']}, ${feed['feedId']})">
-                                <img class="icon-end-edit" src="static/assets/img/done.png" alt="">
-                            </div>
-                            <hr>
-                            <!--         피드에 등록되는 댓글 리스트 영역        -->
-                            <div id="${feed['feedId']}-comment-area">
-
-                            </div>
-
-                            <div class="input-group mb-3" style="margin:auto;height: 36px;width: 560px;">
-                                <input type="text" class="form-control commenet" placeholder="댓글을 입력하세요"
-                                       aria-label="Recipient's username" aria-describedby="basic-addon2" id='${feed['feedId']}-comment-val'>
-                                <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary comment2" type="button" onclick="writeComment(${feed['feedId']})">입력</button>
-                                </div>
-                            </div>
-
-
-                            <!-- feed modal area-->
-                            <div id="feedModalpage">
-                                <div class="modal fade" id="${feed['feedId']}feedModal" tabindex="-1" role="dialog" aria-labelledby="${feed['feedId']}-feedModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="${feed['feedId']}-feedModalLabel">피드 수정</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <input type="text" style="width: 100%" id='${feed['feedId']}-feed-edit-value' value="${feed['contents']}">
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
-                                                <button type="button" class="btn btn-primary" onclick="editFeed(${feed['kakaoId']}, ${feed['feedId']})">수정하기</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-            $("#cards-box").append(tempHtml);
         }
 
         function writePost() {
@@ -492,8 +430,71 @@
             })
         }
 
-    </script>
+        function makeListPost(feed) {
+            let date = feed['lastModifiedDate'].replace("T", "  ").substring(0, feed['lastModifiedDate'].indexOf(".") - 2);
+            let tempHtml = `
+                        <div class="card">
+                            <!-- date/username 영역 -->
+                            <div class="writer">
+                                <img src="${feed['imgLink']}" style="width: 60px; float: left; border-radius: 50px" hspace=10>
+                                <b style="font-size: medium">${feed['username']}</b>
+                                <h6 style="font-size: smaller">${date}</h6>
+                            </div>
+                            <!-- contents 조회/수정 영역    456456-->
+                            <div id="${feed['feedId']}-feed-val" class="feed-val">
+                                <h6 id="${feed['feedId']}-feedValue">${feed['contents']}</h6>
+                            </div>
 
+                            <!-- 버튼 영역-->
+                            <div class="footer">
+
+                                <div data-toggle="modal" onclick="openModal(${feed['feedId']})" >
+                                  <img class="icon-start-edit" src="static/assets/img/edit.png" alt=""> </div>
+
+
+                                <img class="icon-delete" src="static/assets/img/delete.png" alt="" onclick="deleteFeed(${feed['kakaoId']}, ${feed['feedId']})">
+                                <img class="icon-end-edit" src="static/assets/img/done.png" alt="">
+                            </div>
+                            <hr>
+                            <!--         피드에 등록되는 댓글 리스트 영역        -->
+                            <div id="${feed['feedId']}-comment-area">
+
+                            </div>
+
+                            <div class="input-group mb-3" style="margin:auto;height: 36px;width: 560px;">
+                                <input type="text" class="form-control commenet" placeholder="댓글을 입력하세요"
+                                       aria-label="Recipient's username" aria-describedby="basic-addon2" id='${feed['feedId']}-comment-val'>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary comment2" type="button" onclick="writeComment(${feed['feedId']})">입력</button>
+                                </div>
+                            </div>
+
+                            <!-- feed modal area-->
+                            <div id="feedModalpage">
+                                <div class="modal fade" id="${feed['feedId']}feedModal" tabindex="-1" role="dialog" aria-labelledby="${feed['feedId']}-feedModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="${feed['feedId']}-feedModalLabel">피드 수정</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="text" style="width: 100%" id='${feed['feedId']}-feed-edit-value' value="${feed['contents']}">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                                                <button type="button" class="btn btn-primary" onclick="editFeed(${feed['kakaoId']}, ${feed['feedId']})">수정하기</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+            $("#cards-box").append(tempHtml);
+        }
+    </script>
 </head>
 <body style="background-color: lightgray;">
 
