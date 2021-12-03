@@ -183,11 +183,9 @@
 
         function updateUserimg() {
             let image = $('#formFile')[0].files[0]
-            let username = $('#inputUsername').val()
 
             let form_data = new FormData()
             form_data.append("image", image)
-            form_data.append("username", username)
 
             $.ajax({
                 type: "PUT",
