@@ -185,10 +185,6 @@
             let image = $('#formFile')[0].files[0]
             let username = $('#inputUsername').val()
 
-            if (image == undefined) {
-                image = " ";
-            }
-
             let form_data = new FormData()
             form_data.append("image", image)
             form_data.append("username", username)
