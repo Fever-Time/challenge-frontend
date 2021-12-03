@@ -215,7 +215,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "https://api.fevertime.shop/certifications",
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}/certi`,
                 data: form_data,
                 cache: false,
                 contentType: false,
@@ -233,7 +233,7 @@
         function getCertification() {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}/certifications`,
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}/certis`,
                 data: {},
                 success: function (certifications) {
                     showCertification(certifications);
@@ -331,8 +331,10 @@
 
         // 인증 가져오기
         function showCertification(certifications) {
+            console.log('------------------')
+            console.log(certifications)
             for (let i = 0; i < certifications.length; i++) {
-                let temp_html = `<div class="card-check">
+                let temp_html = `<div class="card-check" onclick="openModal(${certifications[i]['certificationId']})">
                                     <div class="card-header">
                                         <img src="${certifications[i]['imgLink']}" alt=""/>
                                     </div>
@@ -345,6 +347,45 @@
                                         </p>
                                         <p>${certifications[i]['createdDate']}</p>
                                     </div>
+                                    <!-- certification modal area-->
+                                    <div id="feedModalpage">
+                                        <div class="modal fade" id="${certifications[i]['certificationId']}feedModal" tabindex="-1" role="dialog" aria-labelledby="${certifications['certificationId']}-feedModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="${certifications['certificationId']}-feedModalLabel">인증 정보</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div>
+                                                            <img src="${certifications[i]['imgLink']}" alt="" class="row-cols-6" style="margin: 0 auto; float: none; display: flex; margin-bottom: 50px"/>
+                                                        </div>
+                                                        <div style="margin-bottom: 20px; border: #0c5460">
+                                                            <p style="font-size: large; font-weight: bolder">챌린지 인증 날짜</p>
+                                                            <p >
+                                                                ${certifications[i]['createdDate']}
+                                                            </p>
+                                                        </div>
+
+                                                        <div>
+                                                            <h5 style="font-size: large; font-weight: bolder">챌린지 인증 후기</h5>
+                                                            <p style="font-size: ">
+                                                                ${certifications[i]['contents']}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-danger row-cols-6" style="margin: 0 auto; float: none"  data-dismiss="modal">확인</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
                                 </div>`;
 
                 $("#card-group").append(temp_html);
@@ -359,6 +400,12 @@
                 $('#map-container').hide()
             }
         }
+
+        function openModal(certificationId) {
+            $(`#${certificationId}feedModal`).modal('show'); // 모달이 띄워진다.
+
+        }
+
     </script>
 </head>
 <body>
