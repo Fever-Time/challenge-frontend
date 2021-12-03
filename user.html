@@ -78,6 +78,7 @@
             getUserInfo();
             getCreatedChallenge();
             getCreatedFeed();
+
             $.ajaxSetup({
                 error: function (jqXHR, exception) {
                     switch (jqXHR.status) {
@@ -88,6 +89,11 @@
                 }
             });
         });
+
+        function logout() {
+            localStorage.removeItem("token");
+            location.href = "index.html";
+        }
 
         function onClickChallenge(challengeId) {
             location.href = `/challenge/${challengeId}`
@@ -175,14 +181,13 @@
 
         }
 
-        function updateUserInfo() {
+        function updateUserimg() {
             let image = $('#formFile')[0].files[0]
             let username = $('#inputUsername').val()
 
-            // if (image == undefined) {
-            //     let ar = imgLink.split("/");
-            //     image = ar[ar.length - 1]
-            // }
+            if (image == undefined) {
+                image = " ";
+            }
 
             let form_data = new FormData()
             form_data.append("image", image)
@@ -191,6 +196,29 @@
             $.ajax({
                 type: "PUT",
                 url: "http://localhost:8080/user",
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) { // 성공하면
+                    alert(response['msg']);
+                    window.location.reload();
+                }
+            })
+        }
+
+        function updateUsername() {
+            let username = $('#inputUsername').val()
+
+            let form_data = new FormData()
+            form_data.append("username", username)
+
+            $.ajax({
+                type: "PUT",
+                url: "http://localhost:8080/username",
                 data: form_data,
                 cache: false,
                 contentType: false,
@@ -419,21 +447,24 @@
                  style="margin-top: 50px;width: 900px;">
                 <div class="single-product-img" style="width:250px; height:200px; margin:auto">
                     <img id="thumbnail"
-                         style="width:250px; height:200px;"
+                         style="width:250px; height:200px; float: left;"
                          alt="" src="">
                 </div>
-                <div class="form-group" style="text-align: center; margin-top: 20px">
-                    <input type="file" class="form-control-file" id="formFile"
-                           style="width: 200px;margin: auto;"
-                           onchange="setThumbnail(event);">
-                </div>
+                <form class="form-inline" style="width: 230px;margin: auto">
+                    <div class="form-group mb-2" style="margin-bottom: 0 !important;margin-top: 10px">
+                        <label for="inputUsername"></label><input type="file" id="formFile" style="width: 190px;" onchange="setThumbnail(event);">
+                        <button type="button" class="btn btn-outline-light" style="background-color: #F28123" onclick="updateUserimg()">변경</button>
+                    </div>
+                </form>
+                <hr>
                 <div class="form-group" style="text-align: center">
-                    <label for="inputUsername"><b>닉네임</b></label>
-                    <input type="text" class="form-control" id="inputUsername"
-                           style="width: 150px;margin: auto;">
-                    <button class="btn btn-outline-light" style="margin-top: 10px;background-color: #F28123"
-                            onclick="updateUserInfo()">변경하기
-                    </button>
+                    <label><b>닉네임</b></label>
+                    <form class="form-inline" style="width: 230px;margin: auto">
+                        <div class="form-group" style="margin-bottom: 0 !important;">
+                            <label for="inputUsername"></label><input type="text" id="inputUsername" style="border:1px solid gray; border-radius: 3px">
+                        </div>
+                        <button type="button" class="btn btn-outline-light" style="background-color: #F28123" onclick="updateUsername()">변경</button>
+                    </form>
                 </div>
             </div>
         </div>
