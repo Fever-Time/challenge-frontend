@@ -168,25 +168,18 @@
             getChallenge();
             getCertification();
 
-            $(document).ready(function () {
-                getChallenges("All");
-                $("input:button[name='button']").on('click', function () {
-                    getChallenges($(this).val());
-                });
-
-                $.ajaxSetup({
-                    error: function (jqXHR, exception) {
-                        switch (jqXHR.status) {
-                            case 401:
-                                alert('로그인을 해주세요.');
-                                break;
-                        }
-                    },
-                });
-            })
+            $.ajaxSetup({
+                error: function (jqXHR, exception) {
+                    switch (jqXHR.status) {
+                        case 401:
+                            alert('로그인을 해주세요.');
+                            break;
+                    }
+                },
+            });
         })
 
-        function onClickJoinBtnHandler() {
+        function showChallengeCerti() {
             if (localStorage.getItem("token") == null) {
                 alert("로그인후 챌린지에 도전해주세요 !!")
             } else {
@@ -251,15 +244,46 @@
             })
         }
 
-        //인원이 다 차면 모집종료 버튼으로 변경
+        // 인원이 다 차면 모집종료 버튼으로 변경
         function checkChallenge(challenge) {
             if (challenge['participants'] === challenge['limitPerson']) {
                 showEndBtn();
+            } else if (localStorage.getItem("token") != null) {
+                $.ajax({
+                    type: "GET",
+                    url: `http://localhost:8080/challenges/${CHALLENGE_ID}/user`,
+                    data: {},
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                    },
+                    success: function (response) {
+                        let userHistories = response['userHistories']
+
+                        if (userHistories.length == 0) {
+                            showJoinBtn();
+                        } else {
+                            let flag;
+                            for (let i = 0; i < userHistories.length; i++) {
+                                if (userHistories[i]['challengeStatus'] == "JOIN") {
+                                    flag = true;
+                                }
+                            }
+
+                            if (flag) {
+                                showJoinCancelBtn();
+                                showChallengeCerti();
+                            } else {
+                                showJoinBtn();
+                            }
+                        }
+                    }
+                })
             } else {
                 showJoinBtn();
             }
         }
 
+        // 챌린지 참여 버튼 보여주기
         function showJoinBtn() {
             let temp_html = `<a onclick="onClickJoinBtnHandler()" class="cart-btn">
                                     <i class="fas fa-bolt"></i>Join Challenge
@@ -270,6 +294,17 @@
             $("#check-challenge").append(temp_html);
         }
 
+        function showJoinCancelBtn() {
+            let temp_html = `<a onclick="onClickJoinCancelBtnHandler()" class="cart-btn">
+                                    <i class="fas fa-bolt"></i>Join Challenge Cancel
+                                 </a>
+                                 <a onclick="location.href='index.html'" class="cart-btn-h">
+                                    <i class="fas fa-home"></i> Go to Main
+                                 </a>`
+            $("#check-challenge").append(temp_html);
+        }
+
+        // 챌린지 모집 종료 보여주기
         function showEndBtn() {
             let temp_html = `<a class="cart-btn btnp">
                                     <i class="fas fa-bolt"></i>모집 종료
@@ -278,6 +313,39 @@
                                     <i class="fas fa-home"></i> Go to Main
                                  </a>`
             $("#check-challenge").append(temp_html);
+        }
+
+        function onClickJoinBtnHandler() {
+            $.ajax({
+                type: "POST",
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}/join`,
+                data: {},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    alert("챌린지 참여되었습니다.")
+                    window.location.reload();
+                }
+            })
+        }
+
+        function onClickJoinCancelBtnHandler() {
+            let flag = confirm("챌린지 인증한 기록이 삭제됩니다. 정말로 취소하시겠습니까?");
+            if (flag) {
+                $.ajax({
+                    type: "PUT",
+                    url: `http://localhost:8080/challenges/${CHALLENGE_ID}/join`,
+                    data: {},
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                    },
+                    success: function (response) {
+                        alert("챌린지 참여가 취소되었습니다.")
+                        window.location.reload();
+                    }
+                })
+            }
         }
 
         // 챌린지 기본 정보 보여주기
@@ -323,11 +391,21 @@
             $("#single-challenge").append(temp_html);
         }
 
+        // 지도 보여주기
+        function showMap(challenge) {
+            if (challenge['locationType'] !== 'ONLINE') {
+                createMap(`${challenge['address']}`)
+            } else {
+                $('#map-container').hide()
+            }
+        }
+
+        function openModal(certificationId) {
+            $(`#${certificationId}feedModal`).modal('show'); // 모달이 띄워진다.
+        }
 
         // 인증 가져오기
         function showCertification(certifications) {
-            console.log('------------------')
-            console.log(certifications)
             for (let i = 0; i < certifications.length; i++) {
                 let temp_html = `<div class="card-check" onclick="openModal(${certifications[i]['certificationId']})">
                                     <div class="card-header">
@@ -378,29 +456,11 @@
                                             </div>
                                         </div>
                                     </div>
-
-
-
-                                </div>`;
+                                  <div>`;
 
                 $("#card-group").append(temp_html);
             }
         }
-
-        // 지도 보여주기
-        function showMap(challenge) {
-            if (challenge['locationType'] !== 'ONLINE') {
-                createMap(`${challenge['address']}`)
-            } else {
-                $('#map-container').hide()
-            }
-        }
-
-        function openModal(certificationId) {
-            $(`#${certificationId}feedModal`).modal('show'); // 모달이 띄워진다.
-
-        }
-
     </script>
 </head>
 <body>
