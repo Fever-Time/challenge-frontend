@@ -284,41 +284,63 @@
 
         function deleteComment(commentId, feedId) {
             $.ajax({
-                type: "DELETE",
-                url: `http://localhost:8080/feeds/${feedId}/comments/${commentId}`,
+                type: "GET",
+                url: `http://localhost:8080/user/comment/${commentId}`,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
                 success: function (response) {
-                    alert("댓글 삭제 완료 !!");
-                    window.location.reload();
+                    if (response['result'] === 'success') {
+                        let agree = prompt("정말 삭제하시겠습니까?", "YES");
+                        if (agree === null) {
+                            alert("취소 되었습니다.");
+                        } else {
+                            $.ajax({
+                                type: "DELETE",
+                                url: `http://localhost:8080/feeds/${feedId}/comments/${commentId}`,
+                                beforeSend: function (xhr) {
+                                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                                },
+                                success: function (response) {
+                                    alert("댓글 삭제 완료 !!");
+                                    window.location.reload();
+                                }
+                            });
+                        }
+                    } else {
+                        alert("권한이 없습니다.");
+                    }
                 }
             })
 
-            $.ajax({
-                type: "DELETE",
-                url: `http://localhost:8080/feeds/${feedId}/comments/${commentId}`,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-                },
-                success: function (response) {
-                    alert("댓글 삭제 완료 !!");
-                    window.location.reload();
-                }
-            })
+
+
+
         }
 
         //해당 댓글에 수정 폼 보이기
         function editOpen(commentId, content) {
-            if ($(`#${commentId}-edit`).css("display") == "none") {
-                $(`#${commentId}-comment`).hide();
-                $(`#${commentId}-contents`).val(content);
-                $(`#${commentId}-edit`).show();
-            } else {
-                $(`#${commentId}-comment`).show();
-                $(`#${commentId}-edit`).hide();
-            }
-            console.log(localStorage.getItem('username'))
+            $.ajax({
+                type: "GET",
+                url: `http://localhost:8080/user/comment/${commentId}`,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    if (response['result'] === 'success') {
+                        if ($(`#${commentId}-edit`).css("display") == "none") {
+                            $(`#${commentId}-comment`).hide();
+                            $(`#${commentId}-contents`).val(content);
+                            $(`#${commentId}-edit`).show();
+                        } else {
+                            $(`#${commentId}-comment`).show();
+                            $(`#${commentId}-edit`).hide();
+                        }
+                    } else {
+                        alert("권한이 없습니다.");
+                    }
+                }
+            })
         }
 
         function editComment(commentId, feedId) {
@@ -333,7 +355,7 @@
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
                 success: function (response) { // 성공하면
-                    alert("피드 수정 완료 !!");
+                    alert("댓글 수정 완료 !!");
                     window.location.reload();
                 }
             })
@@ -433,8 +455,6 @@
                     }
                 }
             })
-
-
         }
 
         function openModal(feedId) {
