@@ -170,6 +170,9 @@
             if (localStorage.getItem("token") == null) {
                 alert("로그인 후 생성해주세요 !!")
             } else {
+                /**
+                 * 생성한 챌린지 3개 제한 로직 추가
+                 */
                 window.location.href = "challenge-create.html"
             }
         }
@@ -314,6 +317,20 @@
     </div>
 </div>
 <!-- breadcrumb section end -->
+
+<!-- features list section -->
+<div class="list-section pt-80 pb-80">
+    <div class="container">
+
+        <div class="row">
+            <div>챌린지에 참여하면 최초 1주차에 3번 인증 미션이 주어집니다.</div>
+            <div>미션 실패 시 아쉽지만 챌린지를 다시 도전해주세요.</div>
+            <div>총 3번의 재도전 기회를 얻을 수 있어요!</div>
+        </div>
+
+    </div>
+</div>
+<!-- end features list section -->
 
 <!-- products -->
 <div class="product-section mt-150 mb-150">
