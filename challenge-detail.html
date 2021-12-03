@@ -168,29 +168,18 @@
             getChallenge();
             getCertification();
 
-            if (localStorage.getIem("token") != null) {
-                getUserChallengeHistory();
-            }
+            $.ajaxSetup({
+                error: function (jqXHR, exception) {
+                    switch (jqXHR.status) {
+                        case 401:
+                            alert('로그인을 해주세요.');
+                            break;
+                    }
+                },
+            });
         })
 
-        function getUserChallengeHistory() {
-            $.ajax({
-                type: "GET",
-                url: "https://api.fevertime.shop/certifications",
-                cache: false,
-                contentType: false,
-                processData: false,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-                },
-                success: function (response) {
-                    alert("인증 되었습니다!")
-                    window.location.reload()
-                }
-            });
-        }
-
-        function onClickJoinBtnHandler() {
+        function showChallengeCerti() {
             if (localStorage.getItem("token") == null) {
                 alert("로그인후 챌린지에 도전해주세요 !!")
             } else {
@@ -201,7 +190,6 @@
                 }
             }
         }
-
 
         function onClickCheck() {
             let contents = $('#formText').val()
@@ -215,7 +203,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "https://api.fevertime.shop/certifications",
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}/certi`,
                 data: form_data,
                 cache: false,
                 contentType: false,
@@ -233,7 +221,7 @@
         function getCertification() {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}/certifications`,
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}/certis`,
                 data: {},
                 success: function (certifications) {
                     showCertification(certifications);
@@ -256,15 +244,46 @@
             })
         }
 
-        //인원이 다 차면 모집종료 버튼으로 변경
+        // 인원이 다 차면 모집종료 버튼으로 변경
         function checkChallenge(challenge) {
             if (challenge['participants'] === challenge['limitPerson']) {
                 showEndBtn();
+            } else if (localStorage.getItem("token") != null) {
+                $.ajax({
+                    type: "GET",
+                    url: `http://localhost:8080/challenges/${CHALLENGE_ID}/user`,
+                    data: {},
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                    },
+                    success: function (response) {
+                        let userHistories = response['userHistories']
+
+                        if (userHistories.length == 0) {
+                            showJoinBtn();
+                        } else {
+                            let flag;
+                            for (let i = 0; i < userHistories.length; i++) {
+                                if (userHistories[i]['challengeStatus'] == "JOIN") {
+                                    flag = true;
+                                }
+                            }
+
+                            if (flag) {
+                                showJoinCancelBtn();
+                                showChallengeCerti();
+                            } else {
+                                showJoinBtn();
+                            }
+                        }
+                    }
+                })
             } else {
                 showJoinBtn();
             }
         }
 
+        // 챌린지 참여 버튼 보여주기
         function showJoinBtn() {
             let temp_html = `<a onclick="onClickJoinBtnHandler()" class="cart-btn">
                                     <i class="fas fa-bolt"></i>Join Challenge
@@ -275,6 +294,17 @@
             $("#check-challenge").append(temp_html);
         }
 
+        function showJoinCancelBtn() {
+            let temp_html = `<a onclick="onClickJoinCancelBtnHandler()" class="cart-btn">
+                                    <i class="fas fa-bolt"></i>Join Challenge Cancel
+                                 </a>
+                                 <a onclick="location.href='index.html'" class="cart-btn-h">
+                                    <i class="fas fa-home"></i> Go to Main
+                                 </a>`
+            $("#check-challenge").append(temp_html);
+        }
+
+        // 챌린지 모집 종료 보여주기
         function showEndBtn() {
             let temp_html = `<a class="cart-btn btnp">
                                     <i class="fas fa-bolt"></i>모집 종료
@@ -283,6 +313,39 @@
                                     <i class="fas fa-home"></i> Go to Main
                                  </a>`
             $("#check-challenge").append(temp_html);
+        }
+
+        function onClickJoinBtnHandler() {
+            $.ajax({
+                type: "POST",
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}/join`,
+                data: {},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    alert("챌린지 참여되었습니다.")
+                    window.location.reload();
+                }
+            })
+        }
+
+        function onClickJoinCancelBtnHandler() {
+            let flag = confirm("챌린지 인증한 기록이 삭제됩니다. 정말로 취소하시겠습니까?");
+            if (flag) {
+                $.ajax({
+                    type: "PUT",
+                    url: `http://localhost:8080/challenges/${CHALLENGE_ID}/join`,
+                    data: {},
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                    },
+                    success: function (response) {
+                        alert("챌린지 참여가 취소되었습니다.")
+                        window.location.reload();
+                    }
+                })
+            }
         }
 
         // 챌린지 기본 정보 보여주기
@@ -328,11 +391,23 @@
             $("#single-challenge").append(temp_html);
         }
 
+        // 지도 보여주기
+        function showMap(challenge) {
+            if (challenge['locationType'] !== 'ONLINE') {
+                createMap(`${challenge['address']}`)
+            } else {
+                $('#map-container').hide()
+            }
+        }
+
+        function openModal(certificationId) {
+            $(`#${certificationId}feedModal`).modal('show'); // 모달이 띄워진다.
+        }
 
         // 인증 가져오기
         function showCertification(certifications) {
             for (let i = 0; i < certifications.length; i++) {
-                let temp_html = `<div class="card-check">
+                let temp_html = `<div class="card-check" onclick="openModal(${certifications[i]['certificationId']})">
                                     <div class="card-header">
                                         <img src="${certifications[i]['imgLink']}" alt=""/>
                                     </div>
@@ -345,18 +420,45 @@
                                         </p>
                                         <p>${certifications[i]['createdDate']}</p>
                                     </div>
-                                </div>`;
+                                    <!-- certification modal area-->
+                                    <div id="feedModalpage">
+                                        <div class="modal fade" id="${certifications[i]['certificationId']}feedModal" tabindex="-1" role="dialog" aria-labelledby="${certifications['certificationId']}-feedModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="${certifications['certificationId']}-feedModalLabel">인증 정보</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div>
+                                                            <img src="${certifications[i]['imgLink']}" alt="" class="row-cols-6" style="margin: 0 auto; float: none; display: flex; margin-bottom: 50px"/>
+                                                        </div>
+                                                        <div style="margin-bottom: 20px; border: #0c5460">
+                                                            <p style="font-size: large; font-weight: bolder">챌린지 인증 날짜</p>
+                                                            <p >
+                                                                ${certifications[i]['createdDate']}
+                                                            </p>
+                                                        </div>
+
+                                                        <div>
+                                                            <h5 style="font-size: large; font-weight: bolder">챌린지 인증 후기</h5>
+                                                            <p style="font-size: ">
+                                                                ${certifications[i]['contents']}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-danger row-cols-6" style="margin: 0 auto; float: none"  data-dismiss="modal">확인</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                  <div>`;
 
                 $("#card-group").append(temp_html);
-            }
-        }
-
-        // 지도 보여주기
-        function showMap(challenge) {
-            if (challenge['locationType'] !== 'ONLINE') {
-                createMap(`${challenge['address']}`)
-            } else {
-                $('#map-container').hide()
             }
         }
     </script>
