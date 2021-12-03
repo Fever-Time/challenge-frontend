@@ -75,6 +75,9 @@
         let imgLink;
 
         $(document).ready(function () {
+            getUserInfo();
+            getCreatedChallenge();
+            getCreatedFeed();
             $.ajaxSetup({
                 error: function (jqXHR, exception) {
                     switch (jqXHR.status) {
@@ -84,9 +87,6 @@
                     }
                 }
             });
-            getUserInfo();
-            getCreatedChallenge();
-            getCreatedFeed();
         });
 
         function onClickChallenge(challengeId) {
@@ -96,7 +96,7 @@
         function getUserInfo() {
             $.ajax({
                 type: "GET",
-                url: "https://api.fevertime.shop/user",
+                url: "http://localhost:8080/user",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -112,7 +112,7 @@
         function getCreatedChallenge() {
             $.ajax({
                 type: "GET",
-                url: "https://api.fevertime.shop/user/challenges",
+                url: "http://localhost:8080/user/challenges",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -148,7 +148,7 @@
         function getCreatedFeed() {
             $.ajax({
                 type: "GET",
-                url: "https://api.fevertime.shop/user/feeds",
+                url: "http://localhost:8080/user/feeds",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -190,7 +190,7 @@
 
             $.ajax({
                 type: "PUT",
-                url: "https://api.fevertime.shop/user",
+                url: "http://localhost:8080/user",
                 data: form_data,
                 cache: false,
                 contentType: false,
@@ -407,39 +407,6 @@
                                 </div>
                             </div>
                         </div>
-
-            <div class="col-lg-4">
-                <div class="total-section">
-                    <table class="total-table">
-                        <thead class="total-table-head">
-                        <tr class="table-total-row">
-                            <th>구분</th>
-                            <th>결과</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr class="total-data">
-                            <td><strong>진행 챌린지</strong></td>
-                            <td>0</td>
-                        </tr>
-                        <tr class="total-data">
-                            <td><strong>중단 챌린지</strong></td>
-                            <td>0</td>
-                        </tr>
-                        <tr class="total-data">
-                            <td><strong>중료 챌린지</strong></td>
-                            <td>0</td>
-                        </tr>
-                        <!--
-                        {#                        <tr class="total-data">#}
-                        {#                            <td><strong>전체 달성률</strong></td>#}
-                        {#                            <td>99%</td>#}
-                        {#                        </tr>#}
-                        -->
-                        </tbody>
-                    </table>
-                    <div class="cart-buttons">
-                        <a href="#" id="delete-user-btn" class="boxed-btn black">회원탈퇴</a>
                     </div>
                 </div>
             </div>
@@ -523,5 +490,7 @@
 <!-- main js -->
 <script src="./static/assets/js/main.js"></script>
 <!-- bootstrap js end -->
+
+
 </body>
 </html>

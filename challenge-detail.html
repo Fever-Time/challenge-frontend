@@ -232,7 +232,7 @@
         function getChallenge() {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}`,
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}`,
                 data: {},
                 success: function (response) {
                     let challenge = response;
