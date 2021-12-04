@@ -525,10 +525,8 @@
                 },
                 success: function (response) {
                     if (response['result'] === 'success') {
-                        let agree = prompt("정말 삭제하시겠습니까?", "YES");
-                        if (agree === null) {
-                            alert("취소 되었습니다.");
-                        } else {
+                        let agree = confirm("정말 삭제하시겠습니까?");
+                        if (agree) {
                             $.ajax({
                                 type: "DELETE",
                                 url: `http://localhost:8080/challenges/${challengeId}/certis/${certiId}`,
