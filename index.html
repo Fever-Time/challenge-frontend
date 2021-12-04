@@ -117,7 +117,6 @@
                     console.log(response)
                 }
             })
-
         }
 
         function showChallenges(challenges) {
@@ -173,7 +172,24 @@
                 /**
                  * 생성한 챌린지 3개 제한 로직 추가
                  */
-                window.location.href = "challenge-create.html"
+                $.ajax({
+                    type: "GET",
+                    url: "http://localhost:8080/user/challenges",
+                    data: {},
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                    },
+                    success: function (response) {
+                        if(response.length >= 3) {
+                            alert("챌린지는 3개까지 생성할 수 있어요!")
+                        } else {
+                            window.location.href = "challenge-create.html"
+                        }
+                    },
+                    error: function () {
+                        alert("로그인 후 생성해주세요 !!")
+                    }
+                })
             }
         }
 
@@ -196,6 +212,14 @@
                     showChallenges(response)
                 }
             })
+        }
+
+        function onClickMyPage() {
+            if (localStorage.getItem("token") == null) {
+                alert("로그인을 해주세요!");
+            } else {
+                location.href = "user.html";
+            }
         }
     </script>
 </head>
@@ -234,7 +258,7 @@
                             <li>
                                 <a href="#">User</a>
                                 <ul class="sub-menu">
-                                    <li><a href="user.html">My Page</a></li>
+                                    <li><a href="#" onclick="onClickMyPage()">My Page</a></li>
                                     <li><a href="#" data-toggle="modal" data-target="#exampleModal">Login</a></li>
                                 </ul>
                             </li>

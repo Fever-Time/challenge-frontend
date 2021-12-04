@@ -210,6 +210,14 @@
             localStorage.removeItem("token");
             location.href = "index.html";
         }
+
+        function onClickMyPage() {
+            if (localStorage.getItem("token") == null) {
+                alert("로그인을 해주세요!");
+            } else {
+                location.href = "user.html";
+            }
+        }
     </script>
 </head>
 <body>
@@ -247,7 +255,7 @@
                             <li>
                                 <a href="#">User</a>
                                 <ul class="sub-menu">
-                                    <li><a href="user.html">My Page</a></li>
+                                    <li><a href="#" onclick="onClickMyPage()">My Page</a></li>
                                     <li><a href="#" onclick="logout()">Logout</a></li>
                                 </ul>
                             </li>
