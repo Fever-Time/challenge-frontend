@@ -18,6 +18,7 @@
     <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
     <!-- fontawesome -->
     <link rel="stylesheet" href="./static/assets/css/all.min.css">
+    <script src="https://use.fontawesome.com/7c27437cf7.js"></script>
     <!-- bootstrap -->
     <link rel="stylesheet" href="./static/assets/bootstrap/css/bootstrap.min.css">
     <!-- owl carousel -->
@@ -107,7 +108,6 @@
         })
 
         function getChallenges(kind) {
-            console.log(kind)
             $.ajax({
                 type: "GET",
                 url: "http://localhost:8080/challenges",
@@ -121,7 +121,6 @@
 
         function showChallenges(challenges) {
             if (challenges.length == 0) {
-                // $('#container__category').hide()
                 $('#no_challenge').show()
                 $('#challenge-list').empty()
                 return
@@ -136,8 +135,6 @@
                 let img = challenges[i]['imgLink'];
                 let start = challenges[i]['startDate'];
                 let end = challenges[i]['endDate'];
-                // let category = challenges[i]['category']['name'];
-                // let status = challenges[i]['challenge_status'];
                 let limitPerson = challenges[i]['limitPerson'];
                 let participants = challenges[i]['participants']
 
@@ -180,7 +177,7 @@
                         xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                     },
                     success: function (response) {
-                        if(response.length >= 3) {
+                        if (response.length >= 3) {
                             alert("챌린지는 3개까지 생성할 수 있어요!")
                         } else {
                             window.location.href = "challenge-create.html"
@@ -343,14 +340,25 @@
 <!-- breadcrumb section end -->
 
 <!-- features list section -->
-<div class="list-section pt-80 pb-80">
+<div class="list-section" style="padding: 60px">
     <div class="container">
-
-        <div class="row">
-            <div>챌린지에 참여하면 최초 1주차에 3번 인증 미션이 주어집니다.</div>
-            <div>미션 실패 시 아쉽지만 챌린지를 다시 도전해주세요.</div>
-            <div>총 3번의 재도전 기회를 얻을 수 있어요!</div>
+        <h4 style="margin-bottom: 40px">챌린지 인증 방법</h4>
+        <div>
+            <h5><i class="fa fa-check" aria-hidden="true" style="margin: 10px;color: #F28123;"></i>챌린지에 참여하면 최초 1주차에 3번
+                인증 미션이 주어집니다.
+            </h5>
         </div>
+        <div>
+            <h5><i class="fa fa-check" aria-hidden="true" style="margin: 10px;color: #F28123;"></i>미션 실패 시 아쉽지만 챌린지를 다시
+                도전해주세요.
+            </h5>
+        </div>
+        <div>
+            <h5><i class="fa fa-check" aria-hidden="true" style="margin: 10px;color: #F28123;"></i>총 3번의 재도전 기회를 얻을 수
+                있어요!
+            </h5>
+        </div>
+
 
     </div>
 </div>
@@ -368,10 +376,8 @@
                         <input type="button" id="운동" name="button" value="운동" class="btn btn-outline-light"/>
                         <input type="button" id="공부" name="button" value="공부" class="btn btn-outline-light"/>
                         <input type="button" id="취미" name="button" value="취미" class="btn btn-outline-light"/>
-                        <!--                        <li class="active" data-filter="*">All</li>-->
-                        <!--                        <li data-filter=".category1">운동</li>-->
-                        <!--                        <li data-filter=".category2">공부</li>-->
-                        <!--                        <li data-filter=".category3">취미</li>-->
+                        <input type="button" id="독서" name="button" value="독서" class="btn btn-outline-light"/>
+                        <input type="button" id="기타" name="button" value="기타" class="btn btn-outline-light"/>
                     </ul>
                 </div>
             </div>
