@@ -407,6 +407,14 @@
             $(`#${certificationId}feedModal`).modal('show'); // 모달이 띄워진다.
         }
 
+        function onClickMyPage() {
+            if (localStorage.getItem("token") == null) {
+                alert("로그인을 해주세요!");
+            } else {
+                location.href = "user.html";
+            }
+        }
+
         // 인증 가져오기
         function showCertification(certifications) {
             for (let i = 0; i < certifications.length; i++) {
@@ -501,7 +509,7 @@
                             <li>
                                 <a href="#">User</a>
                                 <ul class="sub-menu">
-                                    <li><a href="user.html">My Page</a></li>
+                                    <li><a href="#" onclick="onClickMyPage()">My Page</a></li>
                                     <li><a href="#" data-toggle="modal" data-target="#exampleModal">Login</a></li>
                                 </ul>
                             </li>
