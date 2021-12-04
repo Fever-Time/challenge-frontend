@@ -18,6 +18,7 @@
     <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
     <!-- fontawesome -->
     <link rel="stylesheet" href="./static/assets/css/all.min.css">
+    <script src="https://use.fontawesome.com/7c27437cf7.js"></script>
     <!-- bootstrap -->
     <link rel="stylesheet" href="./static/assets/bootstrap/css/bootstrap.min.css">
     <!-- owl carousel -->
@@ -99,18 +100,14 @@
                 error: function (jqXHR, exception) {
                     switch (jqXHR.status) {
                         case 401:
-                            alert('로그인 후 생성해주세요 !!');
+                            alert('로그인을 해주세요.');
                             break;
-                        // case 423:
-                        //     alert('중복된 id!!');
-                        //     break;
                     }
                 },
             });
         })
 
         function getChallenges(kind) {
-            console.log(kind)
             $.ajax({
                 type: "GET",
                 url: "https://api.fevertime.shop/challenges",
@@ -120,12 +117,10 @@
                     console.log(response)
                 }
             })
-
         }
 
         function showChallenges(challenges) {
             if (challenges.length == 0) {
-                // $('#container__category').hide()
                 $('#no_challenge').show()
                 $('#challenge-list').empty()
                 return
@@ -140,8 +135,6 @@
                 let img = challenges[i]['imgLink'];
                 let start = challenges[i]['startDate'];
                 let end = challenges[i]['endDate'];
-                // let category = challenges[i]['category']['name'];
-                // let status = challenges[i]['challenge_status'];
                 let limitPerson = challenges[i]['limitPerson'];
                 let participants = challenges[i]['participants']
 
@@ -173,7 +166,27 @@
             if (localStorage.getItem("token") == null) {
                 alert("로그인 후 생성해주세요 !!")
             } else {
-                window.location.href = "challenge-create.html"
+                /**
+                 * 생성한 챌린지 3개 제한 로직 추가
+                 */
+                $.ajax({
+                    type: "GET",
+                    url: "https://api.fevertime.shop/user/challenges",
+                    data: {},
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                    },
+                    success: function (response) {
+                        if (response.length >= 3) {
+                            alert("챌린지는 3개까지 생성할 수 있어요!")
+                        } else {
+                            window.location.href = "challenge-create.html"
+                        }
+                    },
+                    error: function () {
+                        alert("로그인 후 생성해주세요 !!")
+                    }
+                })
             }
         }
 
@@ -196,6 +209,14 @@
                     showChallenges(response)
                 }
             })
+        }
+
+        function onClickMyPage() {
+            if (localStorage.getItem("token") == null) {
+                alert("로그인을 해주세요!");
+            } else {
+                location.href = "user.html";
+            }
         }
     </script>
 </head>
@@ -234,7 +255,7 @@
                             <li>
                                 <a href="#">User</a>
                                 <ul class="sub-menu">
-                                    <li><a href="user.html">My Page</a></li>
+                                    <li><a href="#" onclick="onClickMyPage()">My Page</a></li>
                                     <li><a href="#" data-toggle="modal" data-target="#exampleModal">Login</a></li>
                                 </ul>
                             </li>
@@ -318,6 +339,31 @@
 </div>
 <!-- breadcrumb section end -->
 
+<!-- features list section -->
+<div class="list-section" style="padding: 60px">
+    <div class="container">
+        <h4 style="margin-bottom: 40px">챌린지 인증 방법</h4>
+        <div>
+            <h5><i class="fa fa-check" aria-hidden="true" style="margin: 10px;color: #F28123;"></i>챌린지에 참여하면 최초 1주차에 3번
+                인증 미션이 주어집니다.
+            </h5>
+        </div>
+        <div>
+            <h5><i class="fa fa-check" aria-hidden="true" style="margin: 10px;color: #F28123;"></i>미션 실패 시 아쉽지만 챌린지를 다시
+                도전해주세요.
+            </h5>
+        </div>
+        <div>
+            <h5><i class="fa fa-check" aria-hidden="true" style="margin: 10px;color: #F28123;"></i>총 3번의 재도전 기회를 얻을 수
+                있어요!
+            </h5>
+        </div>
+
+
+    </div>
+</div>
+<!-- end features list section -->
+
 <!-- products -->
 <div class="product-section mt-150 mb-150">
     <div class="container" style="text-align: center">
@@ -330,10 +376,8 @@
                         <input type="button" id="운동" name="button" value="운동" class="btn btn-outline-light"/>
                         <input type="button" id="공부" name="button" value="공부" class="btn btn-outline-light"/>
                         <input type="button" id="취미" name="button" value="취미" class="btn btn-outline-light"/>
-                        <!--                        <li class="active" data-filter="*">All</li>-->
-                        <!--                        <li data-filter=".category1">운동</li>-->
-                        <!--                        <li data-filter=".category2">공부</li>-->
-                        <!--                        <li data-filter=".category3">취미</li>-->
+                        <input type="button" id="독서" name="button" value="독서" class="btn btn-outline-light"/>
+                        <input type="button" id="기타" name="button" value="기타" class="btn btn-outline-light"/>
                     </ul>
                 </div>
             </div>

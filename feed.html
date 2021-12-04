@@ -48,17 +48,17 @@
         }
 
         .wrap {
-            width: 538px;
+            width: 600px;
             margin: 10px auto;
         }
 
         #contents {
-            width: 538px;
+            width: 600px;
         }
 
         .area-write {
             position: relative;
-            width: 538px;
+            width: 600px;
         }
 
         .area-write img {
@@ -109,7 +109,7 @@
         }
 
         textarea.field::placeholder {
-            width: 216px;
+            width: 300px;
             height: 16px;
             font-family: 'Noto Sans KR', sans-serif;
             font-size: 16px;
@@ -123,7 +123,7 @@
         }
 
         .card {
-            width: 538px;
+            width: 600px;
             border-radius: 5px;
             background-color: #ffffff;
             margin-bottom: 12px;
@@ -145,17 +145,15 @@
             padding: 10px 23px;
         }
 
-        .card .metadata .date {
+        .date {
+            padding-left: 5px !important;
+            font-size: small;
+            color: gray;
         }
 
         .card .metadata .username {
             margin-left: 20px;
-        }
-
-        .contents {
-            padding: 0 23px;
-            word-wrap: break-word;
-            word-break: break-all;
+            margin-right: 20px;
         }
 
         .contents div.edit {
@@ -210,26 +208,34 @@
         }
 
         .commenet {
-            border-top-left-radius: 22px;
-            border-bottom-left-radius: 22px;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
             height: 36px;
         }
 
         .comment2 {
-            border-top-right-radius: 22px;
-            border-bottom-right-radius: 22px;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
         }
 
         .alert-light {
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
+            padding-top: 13px !important;
+            padding-bottom: 13px !important;
             background-color: whitesmoke;
             margin-left: 20px;
-            margin-right: auto;
+            margin-right: 20px;
             border-radius: 30px;
+        }
+
+        .feed-val {
             height: auto;
             width: auto;
-            line-height: 40px;
+            padding: 10px;
+        }
+
+        .writer {
+            padding: 15px;
+            text-align: left;
         }
     </style>
 
@@ -237,6 +243,15 @@
         $(document).ready(function () {
             getFeeds();
 
+            $.ajaxSetup({
+                error: function (jqXHR, exception) {
+                    switch (jqXHR.status) {
+                        case 401:
+                            alert('로그인을 해주세요.');
+                            break;
+                    }
+                }
+            });
         });
 
         function getFeeds() {
@@ -245,11 +260,8 @@
                 url: "https://api.fevertime.shop/feeds",
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
-                    console.log(response)
                     for (let i = 0; i < response.length; i++) {
-                        console.log("feedId = ", response[i]['feedId']);
-
-                        //복구 지점 1
+                        console.log(response[i])
                         makeListPost(response[i]);
                         getComments(response[i]['feedId']);
                     }
@@ -263,7 +275,6 @@
                 url: `https://api.fevertime.shop/feeds/${feedId}/comments`,
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
-                    console.log("comment = ", response)
                     for (let i = 0; i < response.length; i++) {
                         makeListComment(response[i], feedId);
                     }
@@ -271,37 +282,237 @@
             })
         }
 
+        function deleteComment(commentId, feedId) {
+            $.ajax({
+                type: "GET",
+                url: `https://api.fevertime.shop/user/comment/${commentId}`,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    if (response['result'] === 'success') {
+                        let agree = prompt("정말 삭제하시겠습니까?", "YES");
+                        if (agree === null) {
+                            alert("취소 되었습니다.");
+                        } else {
+                            $.ajax({
+                                type: "DELETE",
+                                url: `https://api.fevertime.shop/feeds/${feedId}/comments/${commentId}`,
+                                beforeSend: function (xhr) {
+                                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                                },
+                                success: function (response) {
+                                    alert("댓글 삭제 완료 !!");
+                                    window.location.reload();
+                                }
+                            });
+                        }
+                    } else {
+                        alert("권한이 없습니다.");
+                    }
+                }
+            })
+
+
+        }
+
+        //해당 댓글에 수정 폼 보이기
+        function editOpen(commentId, content) {
+            $.ajax({
+                type: "GET",
+                url: `https://api.fevertime.shop/user/comment/${commentId}`,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    if (response['result'] === 'success') {
+                        if ($(`#${commentId}-edit`).css("display") == "none") {
+                            $(`#${commentId}-comment`).hide();
+                            $(`#${commentId}-contents`).val(content);
+                            $(`#${commentId}-edit`).show();
+                        } else {
+                            $(`#${commentId}-comment`).show();
+                            $(`#${commentId}-edit`).hide();
+                        }
+                    } else {
+                        alert("권한이 없습니다.");
+                    }
+                }
+            })
+        }
+
+        function editComment(commentId, feedId) {
+            let contents = {"contents": $(`#${commentId}-contents`).val()}
+
+            $.ajax({
+                type: "PUT",
+                url: `https://api.fevertime.shop/feeds/${feedId}/comments/${commentId}`,
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(contents),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) { // 성공하면
+                    alert("댓글 수정 완료 !!");
+                    window.location.reload();
+                }
+            })
+        }
+
         function makeListComment(comment, feedId) {
+            let date = comment['lastModifiedDate'].replace("T", "  ").substring(0, comment['lastModifiedDate'].indexOf(".") - 2);
             let tempHtml = `
                                 <div class="alert alert-light" role="alert">
-                                    <div class="text" style="display: flex;">
-                                        <b>${comment['username']}</b>&nbsp;&nbsp; ${comment['contents']}
+                                    <div style="text-align: left">
+                                        <p style="margin-bottom: 5px"><b>${comment['username']}</b>
+                                        <span class="date">${date}&nbsp;
+                                            <img class="icon-start-edit" src="static/assets/img/edit.png" style="width: 15px" alt="" onclick="editOpen(${comment['commentId']},'${comment['contents']}')"> &nbsp;
+                                            <img class="icon-delete" src="static/assets/img/delete.png" style="width: 13px" onclick="deleteComment(${comment['commentId']},${feedId})" alt="">
+                                        </span></p>
+                                        <span id="${comment['commentId']}-comment">${comment['contents']}</span>
+                                        <div class="input-group" style="height: 36px;width: 520px ;display: none" id='${comment['commentId']}-edit'>
+                                            <input type="text" class="form-control commenet"
+                                                   aria-label="Recipient's username" aria-describedby="basic-addon2" id="${comment['commentId']}-contents">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary comment2" type="button" onclick="editComment(${comment['commentId']},${feedId})">수정</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             `
             $(`#${feedId}-comment-area`).append(tempHtml);
         }
 
+        function writePost() {
+            let content = {"contents": $('#contents').val()}
+
+            $.ajax({
+                type: "POST",
+                url: "https://api.fevertime.shop/feed",
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(content),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    alert("피드 등록 완료 !!");
+                    window.location.reload();
+
+                }
+            })
+        }
+
+        function writeComment(feedId) {
+            let comment = {"contents": $(`#${feedId}-comment-val`).val()}
+
+            console.log("comment = ", comment);
+            console.log("feedId test", feedId);
+
+            $.ajax({
+                type: "POST",
+                url: `https://api.fevertime.shop/feeds/${feedId}/comment`,
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(comment),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    alert("댓글 등록 완료 !!");
+                    window.location.reload();
+                }
+            })
+        }
+
+        function deleteFeed(kakaoId, feedId) {
+            $.ajax({
+                type: "GET",
+                url: `https://api.fevertime.shop/user/feed/${feedId}`,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    if (response['result'] === 'success') {
+                        let agree = prompt("정말 삭제하시겠습니까?", "YES");
+                        if (agree === null) {
+                            alert("취소 되었습니다.");
+                        } else {
+                            $.ajax({
+                                type: "DELETE",
+                                url: `https://api.fevertime.shop/feeds/${feedId}`,
+                                beforeSend: function (xhr) {
+                                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                                },
+                                success: function (response) {
+                                    alert("피드 삭제 완료 !!");
+                                    window.location.reload();
+                                }
+                            });
+                        }
+                    } else {
+                        alert("권한이 없습니다.");
+                    }
+                }
+            })
+        }
+
+        function openModal(feedId) {
+            $.ajax({
+                type: "GET",
+                url: `https://api.fevertime.shop/user/feed/${feedId}`,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    if (response['result'] === 'success') {
+                        $(`#${feedId}feedModal`).modal('show'); // 모달이 띄워진다.
+                        let feedText = $(`#${feedId}-feed-val`).text(); // 피드에 입력된 값 -> 나중에 모달 기본값 설정할 때 사용
+                    } else {
+                        alert("권한이 없습니다.");
+                    }
+                }
+            })
+        }
+
+        function editFeed(kakaoId, feedId) {
+            let content = {"contents": $(`#${feedId}-feed-edit-value`).val()}
+
+            $.ajax({
+                type: "PUT",
+                url: `https://api.fevertime.shop/feeds/${feedId}`,
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(content),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) { // 성공하면
+                    alert("피드 수정 완료 !!");
+                    window.location.reload();
+                }
+            })
+        }
+
+        function onClickMyPage() {
+            if (localStorage.getItem("token") == null) {
+                alert("로그인을 해주세요!");
+            } else {
+                location.href = "user.html";
+            }
+        }
 
         function makeListPost(feed) {
-
+            let date = feed['lastModifiedDate'].replace("T", "  ").substring(0, feed['lastModifiedDate'].indexOf(".") - 2);
             let tempHtml = `
                         <div class="card">
                             <!-- date/username 영역 -->
-                            <div class="metadata">
-                                <div class="date">
-                                    ${feed['lastModifiedDate']}
-                                </div>
-                                <div class="username">
-                                    ${feed['username']}
-                                </div>
+                            <div class="writer">
+                                <img src="${feed['imgLink']}" style="width: 60px; float: left; border-radius: 50px" hspace=10>
+                                <b style="font-size: medium">${feed['username']}</b>
+                                <h6 style="font-size: smaller">${date}</h6>
                             </div>
                             <!-- contents 조회/수정 영역    456456-->
-                            <div id="${feed['feedId']}-feed-val">
+                            <div id="${feed['feedId']}-feed-val" class="feed-val">
                                 <h6 id="${feed['feedId']}-feedValue">${feed['contents']}</h6>
                             </div>
-
-
 
                             <!-- 버튼 영역-->
                             <div class="footer">
@@ -319,14 +530,13 @@
 
                             </div>
 
-                            <div class="input-group mb-3" style="margin:auto;height: 36px;width: 500px;">
+                            <div class="input-group mb-3" style="margin:auto;height: 36px;width: 560px;">
                                 <input type="text" class="form-control commenet" placeholder="댓글을 입력하세요"
                                        aria-label="Recipient's username" aria-describedby="basic-addon2" id='${feed['feedId']}-comment-val'>
                                 <div class="input-group-append">
                                     <button class="btn btn-outline-secondary comment2" type="button" onclick="writeComment(${feed['feedId']})">입력</button>
                                 </div>
                             </div>
-
 
                             <!-- feed modal area-->
                             <div id="feedModalpage">
@@ -350,91 +560,10 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
             $("#cards-box").append(tempHtml);
         }
-
-        function writePost() {
-            let content = {"contents": $('#contents').val()}
-
-            $.ajax({
-                type: "POST",
-                url: "https://api.fevertime.shop/feeds",
-                contentType: 'application/json; charset=utf-8',
-                data: JSON.stringify(content),
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-                },
-                success: function (response) {
-                    alert("피드 등록 완료 !!");
-                    window.location.reload();
-
-                }
-            })
-        }
-
-        function writeComment(feedId) {
-            let comment = {"contents": $(`#${feedId}-comment-val`).val()}
-
-            console.log("comment = ", comment);
-            console.log("feedId test", feedId);
-
-            $.ajax({
-                type: "POST",
-                url: `https://api.fevertime.shop/feeds/${feedId}/comments`,
-                contentType: 'application/json; charset=utf-8',
-                data: JSON.stringify(comment),
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-                },
-                success: function (response) {
-                    alert("댓글 등록 완료 !!");
-                    window.location.reload();
-                }
-            })
-        }
-
-        function deleteFeed(kakaoId, feedId) {
-            $.ajax({
-                type: "DELETE",
-                url: `https://api.fevertime.shop/feeds/${feedId}`,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-                },
-                success: function (response) {
-                    alert("피드 삭제 완료 !!");
-                    window.location.reload();
-                }
-            })
-        }
-
-        function openModal(feedId) {
-            $(`#${feedId}feedModal`).modal('show'); // 모달이 띄워진다.
-            let feedText = $(`#${feedId}-feed-val`).text(); // 피드에 입력된 값 -> 나중에 모달 기본값 설정할 때 사용
-
-        }
-
-        function editFeed(kakaoId, feedId) {
-            let content = {"contents": $(`#${feedId}-feed-edit-value`).val()}
-
-            $.ajax({
-                type: "PUT",
-                url: `https://api.fevertime.shop/feeds/${feedId}`,
-                contentType: 'application/json; charset=utf-8',
-                data: JSON.stringify(content),
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-                },
-                success: function (response) { // 성공하면
-                    alert("피드 수정 완료 !!");
-                    window.location.reload();
-                }
-            })
-        }
-
     </script>
-
 </head>
 <body style="background-color: lightgray;">
 
@@ -463,16 +592,16 @@
                     <!-- menu start -->
                     <nav class="main-menu">
                         <ul>
-                            <li class="current-list-item">
+                            <li>
                                 <a href="index.html">Home</a>
                             </li>
-                            <li>
+                            <li class="current-list-item">
                                 <a href="feed.html">Feed</a>
                             </li>
                             <li>
                                 <a href="#">User</a>
                                 <ul class="sub-menu">
-                                    <li><a href="user.html">My Page</a></li>
+                                    <li><a href="#" onclick="onClickMyPage()">My Page</a></li>
                                     <li><a href="#" data-toggle="modal" data-target="#exampleModal">Login</a></li>
                                 </ul>
                             </li>
@@ -499,6 +628,27 @@
 </div>
 <!-- header end -->
 
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="">
+                <img onclick="loginWithKakao()" style="cursor:pointer;"
+                     src="static/assets/img/kakao_login_large_wide.png" alt="카카오 로그인"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- search area start-->
 <div class="search-area">

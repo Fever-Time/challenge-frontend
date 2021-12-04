@@ -86,6 +86,16 @@
     <script>
         $(document).ready(function () {
             setInputDateToday();
+
+            $.ajaxSetup({
+                error: function (jqXHR, exception) {
+                    switch (jqXHR.status) {
+                        case 401:
+                            alert('로그인을 해주세요.');
+                            break;
+                    }
+                },
+            });
         });
 
         function onClickCancelBtnHandler() {
@@ -94,10 +104,6 @@
 
         function createChallenge() {
             let category = $("input[name='category']:checked").val();
-            // $("input[name='category']:checked").each(function (e) {
-            //     category.push($(this).val())
-            // })
-
             let title = $('#title').val()
             let desc = $("#desc").val()
             let startDate = document.querySelector('#start-period').value
@@ -106,6 +112,7 @@
             let address = $('#sample5_address').val()
             let locationType = $('input[name="addType"]:checked').val();
             let limitPerson = $("#max-people").val();
+            console.log("카테고리" + category);
 
             if (title == "") {
                 alert('챌린지 이름을 입력하세요')
@@ -142,7 +149,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "https://api.fevertime.shop/challenges",
+                url: "https://api.fevertime.shop/challenge",
                 data: form_data,
                 cache: false,
                 contentType: false,
@@ -151,7 +158,7 @@
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
                 success: function (response) { // 성공하면
-                    alert(response);
+                    alert(response['msg']);
                     window.location.href = 'index.html'
                 }
             })
@@ -203,6 +210,14 @@
             localStorage.removeItem("token");
             location.href = "index.html";
         }
+
+        function onClickMyPage() {
+            if (localStorage.getItem("token") == null) {
+                alert("로그인을 해주세요!");
+            } else {
+                location.href = "user.html";
+            }
+        }
     </script>
 </head>
 <body>
@@ -240,7 +255,7 @@
                             <li>
                                 <a href="#">User</a>
                                 <ul class="sub-menu">
-                                    <li><a href="user.html">My Page</a></li>
+                                    <li><a href="#" onclick="onClickMyPage()">My Page</a></li>
                                     <li><a href="#" onclick="logout()">Logout</a></li>
                                 </ul>
                             </li>
@@ -343,25 +358,33 @@
                             <p style="margin: auto">명</p>
                         </div>
 
-
-                        <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-                            <input type="checkbox" name="category" value="운동" class="btn-check" id="category1"
-                                   autocomplete="off">
-                            <label onclick="onclickCheckboxHandler(this)"
-                                   class="checkbox-check btn btn-outline-primary"
-                                   for="category1">운동</label>
-
-                            <input type="checkbox" name="category" value="공부" class="btn-check" id="category2"
-                                   autocomplete="off">
-                            <label onclick="onclickCheckboxHandler(this)"
-                                   class="checkbox-check btn btn-outline-primary"
-                                   for="category2">공부</label>
-
-                            <input type="checkbox" name="category" value="취미" class="btn-check" id="category3"
-                                   autocomplete="off">
-                            <label onclick="onclickCheckboxHandler(this)"
-                                   class="checkbox-check btn btn-outline-primary"
-                                   for="category3">취미</label>
+                        <div class="input-group mb-3 create-form">
+                            <span class="input-group-text" style="margin-right: 10px">챌린지 주제</span>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="category" id="inlineRadio1"
+                                       value="운동">
+                                <label class="form-check-label" for="inlineRadio1">운동</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="category" id="inlineRadio2"
+                                       value="공부">
+                                <label class="form-check-label" for="inlineRadio2">공부</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="category" id="inlineRadio3"
+                                       value="취미">
+                                <label class="form-check-label" for="inlineRadio2">취미</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="category" id="inlineRadio4"
+                                       value="독서">
+                                <label class="form-check-label" for="inlineRadio2">독서</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="category" id="inlineRadio5"
+                                       value="기타">
+                                <label class="form-check-label" for="inlineRadio2">기타</label>
+                            </div>
                         </div>
 
                         <input type="hidden" id="address">
