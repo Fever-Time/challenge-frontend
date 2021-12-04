@@ -258,15 +258,35 @@
                     },
                     success: function (response) {
                         let userHistories = response['userHistories']
+                        let certifies = response['certifies']
+
+                        let todayDate = new Date().toISOString().slice(0, 10);
+                        console.log(todayDate);
+
+                        for (let i = 0; i < certifies.length; i++) {
+                            if (certifies[i]['createdDate'] == todayDate) {
+                                showLimitCertiBtn();
+                                return;
+                            }
+                        }
 
                         if (userHistories.length == 0) {
                             showJoinBtn();
                         } else {
                             let flag;
+                            let limitFail = 0;
+
                             for (let i = 0; i < userHistories.length; i++) {
                                 if (userHistories[i]['challengeStatus'] == "JOIN") {
                                     flag = true;
+                                } else if (userHistories[i]['challengeStatus'] == "FAIL") {
+                                    limitFail = limitFail + 1;
                                 }
+                            }
+
+                            if (limitFail >= 3) {
+                                showLimitBtn();
+                                return
                             }
 
                             if (flag) {
@@ -281,6 +301,28 @@
             } else {
                 showJoinBtn();
             }
+        }
+
+        // 하루에 한번 챌린지 제한
+        function showLimitCertiBtn() {
+            let temp_html = `<a class="cart-btn btnp">
+                                    <i class="fas fa-bolt"></i>오늘 인증 완료
+                                 </a>
+                                 <a onclick="location.href='index.html'" class="cart-btn-h">
+                                    <i class="fas fa-home"></i> Go to Main
+                                 </a>`
+            $("#check-challenge").append(temp_html);
+        }
+
+        // 참여 제한 버튼 보여주기
+        function showLimitBtn() {
+            let temp_html = `<a class="cart-btn btnp">
+                                    <i class="fas fa-bolt"></i>참여 제한
+                                 </a>
+                                 <a onclick="location.href='index.html'" class="cart-btn-h">
+                                    <i class="fas fa-home"></i> Go to Main
+                                 </a>`
+            $("#check-challenge").append(temp_html);
         }
 
         // 챌린지 참여 버튼 보여주기
