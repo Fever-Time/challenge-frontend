@@ -114,7 +114,6 @@
                 data: {"kind": kind},
                 success: function (response) {
                     showChallenges(response)
-                    console.log(response)
                 }
             })
         }
@@ -166,9 +165,7 @@
             if (localStorage.getItem("token") == null) {
                 alert("로그인 후 생성해주세요 !!")
             } else {
-                /**
-                 * 생성한 챌린지 3개 제한 로직 추가
-                 */
+                // 챌린지 생성 3개 제한
                 $.ajax({
                     type: "GET",
                     url: "https://api.fevertime.shop/user/challenges",
@@ -192,7 +189,6 @@
 
         function getSearchChallenges() {
             let search = $("#search-input").val();
-            console.log(search);
 
             if (search == "") {
                 alert("검색어를 입력해주세요.")
