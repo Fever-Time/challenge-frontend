@@ -175,7 +175,7 @@
                             alert('로그인을 해주세요.');
                             break;
                     }
-                },
+                }
             });
         })
 
@@ -239,13 +239,19 @@
                     showDetail(challenge)
                     checkChallenge(challenge)
                     showMap(challenge);
-                    // showRelated(related_challenge);
                 }
             })
         }
 
         // 인원이 다 차면 모집종료 버튼으로 변경
         function checkChallenge(challenge) {
+            let endDate = new Date(challenge['endDate'])
+            let nowDate = new Date()
+            if(nowDate > endDate) {
+                showTimeEndBtn();
+                return
+            }
+
             if (challenge['participants'] === challenge['limitPerson']) {
                 showEndBtn();
             } else if (localStorage.getItem("token") != null) {
@@ -357,8 +363,24 @@
             $("#check-challenge").append(temp_html);
         }
 
+        function showTimeEndBtn() {
+            let temp_html = `<a class="cart-btn btnp">
+                                    <i class="fas fa-bolt"></i>챌린지 기간 종료
+                                 </a>
+                                 <a onclick="location.href='index.html'" class="cart-btn-h">
+                                    <i class="fas fa-home"></i> Go to Main
+                                 </a>`
+            $("#check-challenge").append(temp_html);
+        }
+
         function onClickJoinBtnHandler() {
             let flag = confirm("챌린지 참여하시겠습니까?")
+
+            if(localStorage.getItem("token") == null) {
+                alert("로그인 후 챌린지에 참여해주세요.")
+                return
+            }
+
             if (flag) {
                 $.ajax({
                     type: "POST",
@@ -370,6 +392,9 @@
                     success: function (response) {
                         alert("챌린지 참여되었습니다.")
                         window.location.reload();
+                    },
+                    error: function () {
+                        alert("다시 로그인 후 시도해주세요.")
                     }
                 })
             }
@@ -457,6 +482,36 @@
             }
         }
 
+        function deleteCertification(challengeId, certiId) {
+            $.ajax({
+                type: "GET",
+                url: `https://api.fevertime.shop/user/certi/${certiId}`,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    if (response['result'] === 'success') {
+                        let agree = confirm("정말 삭제하시겠습니까?");
+                        if (agree) {
+                            $.ajax({
+                                type: "DELETE",
+                                url: `https://api.fevertime.shop/challenges/${challengeId}/certis/${certiId}`,
+                                beforeSend: function (xhr) {
+                                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                                },
+                                success: function (response) {
+                                    alert("챌린지 인증 삭제 완료 !!");
+                                    window.location.reload();
+                                }
+                            });
+                        }
+                    } else {
+                        alert("권한이 없습니다.");
+                    }
+                }
+            })
+        }
+
         // 인증 가져오기
         function showCertification(certifications) {
             for (let i = 0; i < certifications.length; i++) {
@@ -514,36 +569,6 @@
 
                 $("#card-group").append(temp_html);
             }
-        }
-
-        function deleteCertification(challengeId, certiId) {
-            $.ajax({
-                type: "GET",
-                url: `https://api.fevertime.shop/user/certi/${certiId}`,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-                },
-                success: function (response) {
-                    if (response['result'] === 'success') {
-                        let agree = confirm("정말 삭제하시겠습니까?");
-                        if (agree) {
-                            $.ajax({
-                                type: "DELETE",
-                                url: `https://api.fevertime.shop/challenges/${challengeId}/certis/${certiId}`,
-                                beforeSend: function (xhr) {
-                                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-                                },
-                                success: function (response) {
-                                    alert("챌린지 인증 삭제 완료 !!");
-                                    window.location.reload();
-                                }
-                            });
-                        }
-                    } else {
-                        alert("권한이 없습니다.");
-                    }
-                }
-            })
         }
     </script>
 </head>

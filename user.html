@@ -84,9 +84,6 @@
             });
 
             getUserInfo();
-            getCreatedChallenge();
-            getCreatedFeed();
-            getJoinChallenges();
         });
 
         function logout() {
@@ -110,6 +107,10 @@
                     imgLink = response['imgLink'];
                     $("#inputUsername").val(username);
                     document.getElementById("thumbnail").src = imgLink;
+
+                    getCreatedChallenge();
+                    getCreatedFeed();
+                    getJoinChallenges();
                 }
             })
         }
