@@ -221,6 +221,11 @@
         function updateUserImg() {
             let image = $('#formFile')[0].files[0]
 
+            if (image == null) {
+                alert("사진을 첨부하세요.")
+                return
+            }
+
             let form_data = new FormData()
             form_data.append("image", image)
 
@@ -245,10 +250,9 @@
             let username = $('#inputUsername').val()
             let str_length = username.length //이름 길이
 
-            console.log(str_length)
-
             if (str_length > 8 || str_length == 0) {
                 alert("1~8자 사이로 입력하세요.")
+                return
             }
 
             let form_data = new FormData()

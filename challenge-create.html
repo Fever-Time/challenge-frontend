@@ -114,10 +114,10 @@
             let limitPerson = $("#max-people").val();
             console.log("카테고리" + category);
 
-            if (title == "") {
+            if (title == "" || title.trim().length == 0) {
                 alert('챌린지 이름을 입력하세요')
                 return $('#title').focus();
-            } else if (desc == "") {
+            } else if (desc == "" || desc.trim().length == 0) {
                 alert('상세 내용을 입력하세요')
                 return $('#desc').focus();
             } else if (startDate == "") {
@@ -126,9 +126,12 @@
             } else if (endDate == "") {
                 alert('진행 기간을 입력하세요')
                 return $('#end-period').focus();
-            } else if (limitPerson < 1 || limitPerson > 100) {
-                alert("1~100명 범위로 입력해 주십시오.");
+            } else if (limitPerson < 1 || limitPerson > 33) {
+                alert("1~33명 범위로 입력해 주십시오.");
                 return $('#max-people').focus();
+            } else if (image == null) {
+                alert('이미지을 첨부하세요')
+                return
             }
 
             if (locationType == "OFFLINE" && $('#sample5_address').val() == "") {

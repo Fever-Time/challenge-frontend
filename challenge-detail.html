@@ -192,9 +192,18 @@
         }
 
         function onClickCheck() {
-            let contents = $('#formText').val()
+            let contents = $('#formText').val();
+            let img = $('#formFile')[0].files[0];
 
-            let img = $('#formFile')[0].files[0]
+            if (contents.trim().length == 0) {
+                alert("인증 내용을 입력하세요.")
+                return
+            }
+            if (img == null) {
+                alert("인증 사진을 첨부하세요.")
+                return;
+            }
+
             let form_data = new FormData()
 
             form_data.append("image", img)
@@ -247,7 +256,7 @@
         function checkChallenge(challenge) {
             let endDate = new Date(challenge['endDate'])
             let nowDate = new Date()
-            if(nowDate > endDate) {
+            if (nowDate > endDate) {
                 showTimeEndBtn();
                 return
             }
@@ -376,7 +385,7 @@
         function onClickJoinBtnHandler() {
             let flag = confirm("챌린지 참여하시겠습니까?")
 
-            if(localStorage.getItem("token") == null) {
+            if (localStorage.getItem("token") == null) {
                 alert("로그인 후 챌린지에 참여해주세요.")
                 return
             }
