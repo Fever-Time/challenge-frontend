@@ -385,7 +385,10 @@
 
         function writePost() {
             let content = {"contents": $('#contents').val()}
-
+            if (content['contents'].trim().length === 0) {
+                alert("공백으로 피드를 작성할 수 없습니다.");
+                return;
+            }
             $.ajax({
                 type: "POST",
                 url: "https://api.fevertime.shop/feed",
@@ -399,14 +402,15 @@
                     window.location.reload();
 
                 }
-            })
+            });
         }
 
         function writeComment(feedId) {
             let comment = {"contents": $(`#${feedId}-comment-val`).val()}
-
-            console.log("comment = ", comment);
-            console.log("feedId test", feedId);
+            if (comment['contents'].trim().length === 0) {
+                alert("공백으로 댓글을 작성할 수 없습니다.");
+                return;
+            }
 
             $.ajax({
                 type: "POST",
