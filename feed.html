@@ -344,7 +344,7 @@
         function editComment(commentId, feedId) {
             let contents = {"contents": $(`#${commentId}-contents`).val()}
             if (contents['contents'].trim().length === 0) {
-                alert("공백으로 댓글을 작성할 수 없습니다.");
+                alert("공백으로 댓글을 수정할 수 없습니다.");
                 return;
             }
 
@@ -483,7 +483,10 @@
 
         function editFeed(kakaoId, feedId) {
             let content = {"contents": $(`#${feedId}-feed-edit-value`).val()}
-
+            if (content['contents'].trim().length === 0) {
+                alert("공백으로 피드를 수정할 수 없습니다.");
+                return;
+            }
             $.ajax({
                 type: "PUT",
                 url: `http://localhost:8080/feeds/${feedId}`,
