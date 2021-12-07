@@ -135,7 +135,8 @@
                 let start = challenges[i]['startDate'];
                 let end = challenges[i]['endDate'];
                 let limitPerson = challenges[i]['limitPerson'];
-                let participants = challenges[i]['participants']
+                let participants = challenges[i]['participants'];
+                let endDate = new Date(challenges[i]['endDate'])
 
                 let temp_html = `<div class="col-lg-4 col-md-6 text-center product-lists">
                                                 <div class="single-product-item">
@@ -152,13 +153,35 @@
                                                         </span>
                                                             ${participants}/${limitPerson}명
                                                         </p>
-                                                        <a onclick="location.href='challenge-detail.html?challengeId=${id}'" class="cart-btn">
-                                                            <i class="fas fa-bolt"></i> View Details
-                                                        </a>
+                                                        <div id="${id}-check-challenge">
+                                                        </div>
+
                                                 </div>
                                             </div>`
                 $('#challenge-list').append(temp_html)
+                plusButton(id, endDate)
             }
+
+        }
+
+        //기간 종료 버튼
+        function plusButton(id, endDate) {
+            let nowDate = new Date()
+
+            if (nowDate > endDate) {
+                let temp_html = `<a class="cart-btn btnp" onclick="location.href='challenge-detail.html?challengeId=${id}'">
+                    <i class="fas fa-bolt"></i>챌린지 기간 종료
+                </a>
+            `
+                $(`#${id}-check-challenge`).append(temp_html);
+            } else {
+                let temp_html = `
+                <a onclick="location.href='challenge-detail.html?challengeId=${id}'" class="cart-btn">
+                    <i class="fas fa-bolt"></i> View Details
+                </a>`
+                $(`#${id}-check-challenge`).append(temp_html);
+            }
+
         }
 
         function onClickCreateChallenge() {
@@ -249,7 +272,7 @@
                                 <a href="feed.html">Feed</a>
                             </li>
                             <li>
-                                <a href="#">User</a>
+                                <a href="#" style="margin-right: 110px">User</a>
                                 <ul class="sub-menu">
                                     <li><a href="#" onclick="onClickMyPage()">My Page</a></li>
                                     <li><a href="#" data-toggle="modal" data-target="#exampleModal">Login</a></li>
@@ -258,9 +281,6 @@
 
                             <li>
                                 <div class="header-icons">
-                                    <a class="shopping-cart" href="#">
-                                        1000 <i class="fab fa-bitcoin"></i>
-                                    </a>
                                     <a class="mobile-hide search-bar-icon" href="#">
                                         <i class="fas fa-search"></i>
                                     </a>
@@ -338,23 +358,17 @@
 <!-- features list section -->
 <div class="list-section" style="padding: 60px">
     <div class="container">
-        <h4 style="margin-bottom: 40px">챌린지 인증 방법</h4>
+        <h4 style="margin-bottom: 40px">피버타임 규칙</h4>
         <div>
-            <h5><i class="fa fa-check" aria-hidden="true" style="margin: 10px;color: #F28123;"></i>챌린지에 참여하면 최초 1주차에 3번
-                인증 미션이 주어집니다.
+            <h5><i class="fa fa-check" aria-hidden="true" style="margin: 10px;color: #F28123;"></i>챌린지는 1인당 3개까지 생성
+                가능합니다
             </h5>
         </div>
         <div>
-            <h5><i class="fa fa-check" aria-hidden="true" style="margin: 10px;color: #F28123;"></i>미션 실패 시 아쉽지만 챌린지를 다시
-                도전해주세요.
+            <h5><i class="fa fa-check" aria-hidden="true" style="margin: 10px;color: #F28123;"></i>챌린지별 인증은 하루에 한번만 할 수
+                있습니다
             </h5>
         </div>
-        <div>
-            <h5><i class="fa fa-check" aria-hidden="true" style="margin: 10px;color: #F28123;"></i>총 3번의 재도전 기회를 얻을 수
-                있어요!
-            </h5>
-        </div>
-
 
     </div>
 </div>
