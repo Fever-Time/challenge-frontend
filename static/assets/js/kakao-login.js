@@ -7,7 +7,7 @@ function loginWithKakao() {
         success: function (authObj) {
             $.ajax({
                 type: 'POST',
-                url: 'https://api.fevertime.shop/login/kakao',
+                url: 'http://localhost:8080/login/kakao',
                 contentType: "application/json",
                 data: JSON.stringify({'token': authObj['access_token']}),
                 success: function (response) {
