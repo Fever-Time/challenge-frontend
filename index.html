@@ -191,7 +191,7 @@
                 // 챌린지 생성 3개 제한
                 $.ajax({
                     type: "GET",
-                    url: "http://localhost:8080/user/challenges/create",
+                    url: "https://api.fevertime.shop/user/challenges/create",
                     data: {},
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
