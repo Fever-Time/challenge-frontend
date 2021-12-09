@@ -257,7 +257,7 @@
         function getFeeds() {
             $.ajax({
                 type: "GET",
-                url: "https://api.fevertime.shop/feeds",
+                url: "http://localhost:8080/feeds",
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
                     for (let i = 0; i < response.length; i++) {
@@ -272,7 +272,7 @@
         function getComments(feedId) { // 789
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/feeds/${feedId}/comments`,
+                url: `http://localhost:8080/feeds/${feedId}/comments`,
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
                     for (let i = 0; i < response.length; i++) {
@@ -285,7 +285,7 @@
         function deleteComment(commentId, feedId) {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/user/comment/${commentId}`,
+                url: `http://localhost:8080/user/comment/${commentId}`,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -297,7 +297,7 @@
                         } else {
                             $.ajax({
                                 type: "DELETE",
-                                url: `https://api.fevertime.shop/feeds/${feedId}/comments/${commentId}`,
+                                url: `http://localhost:8080/feeds/${feedId}/comments/${commentId}`,
                                 beforeSend: function (xhr) {
                                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                                 },
@@ -320,7 +320,7 @@
         function editOpen(commentId, content) {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/user/comment/${commentId}`,
+                url: `http://localhost:8080/user/comment/${commentId}`,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -343,10 +343,14 @@
 
         function editComment(commentId, feedId) {
             let contents = {"contents": $(`#${commentId}-contents`).val()}
+            if (contents['contents'].trim().length === 0) {
+                alert("공백으로 댓글을 수정할 수 없습니다.");
+                return;
+            }
 
             $.ajax({
                 type: "PUT",
-                url: `https://api.fevertime.shop/feeds/${feedId}/comments/${commentId}`,
+                url: `http://localhost:8080/feeds/${feedId}/comments/${commentId}`,
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(contents),
                 beforeSend: function (xhr) {
@@ -385,10 +389,13 @@
 
         function writePost() {
             let content = {"contents": $('#contents').val()}
-
+            if (content['contents'].trim().length === 0) {
+                alert("공백으로 피드를 작성할 수 없습니다.");
+                return;
+            }
             $.ajax({
                 type: "POST",
-                url: "https://api.fevertime.shop/feed",
+                url: "http://localhost:8080/feed",
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(content),
                 beforeSend: function (xhr) {
@@ -399,18 +406,19 @@
                     window.location.reload();
 
                 }
-            })
+            });
         }
 
         function writeComment(feedId) {
             let comment = {"contents": $(`#${feedId}-comment-val`).val()}
-
-            console.log("comment = ", comment);
-            console.log("feedId test", feedId);
+            if (comment['contents'].trim().length === 0) {
+                alert("공백으로 댓글을 작성할 수 없습니다.");
+                return;
+            }
 
             $.ajax({
                 type: "POST",
-                url: `https://api.fevertime.shop/feeds/${feedId}/comment`,
+                url: `http://localhost:8080/feeds/${feedId}/comment`,
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(comment),
                 beforeSend: function (xhr) {
@@ -423,22 +431,22 @@
             })
         }
 
-        function deleteFeed(kakaoId, feedId) {
+        function deleteFeed(feedId) {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/user/feed/${feedId}`,
+                url: `http://localhost:8080/user/feed/${feedId}`,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
                 success: function (response) {
                     if (response['result'] === 'success') {
-                        let agree = prompt("정말 삭제하시겠습니까?", "YES");
+                        let agree = confirm("정말 삭제하시겠습니까?");
                         if (agree === null) {
                             alert("취소 되었습니다.");
                         } else {
                             $.ajax({
                                 type: "DELETE",
-                                url: `https://api.fevertime.shop/feeds/${feedId}`,
+                                url: `http://localhost:8080/feeds/${feedId}`,
                                 beforeSend: function (xhr) {
                                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                                 },
@@ -458,7 +466,7 @@
         function openModal(feedId) {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/user/feed/${feedId}`,
+                url: `http://localhost:8080/user/feed/${feedId}`,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -475,10 +483,13 @@
 
         function editFeed(kakaoId, feedId) {
             let content = {"contents": $(`#${feedId}-feed-edit-value`).val()}
-
+            if (content['contents'].trim().length === 0) {
+                alert("공백으로 피드를 수정할 수 없습니다.");
+                return;
+            }
             $.ajax({
                 type: "PUT",
-                url: `https://api.fevertime.shop/feeds/${feedId}`,
+                url: `http://localhost:8080/feeds/${feedId}`,
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(content),
                 beforeSend: function (xhr) {
@@ -521,7 +532,7 @@
                                   <img class="icon-start-edit" src="static/assets/img/edit.png" alt=""> </div>
 
 
-                                <img class="icon-delete" src="static/assets/img/delete.png" alt="" onclick="deleteFeed(${feed['kakaoId']}, ${feed['feedId']})">
+                                <img class="icon-delete" src="static/assets/img/delete.png" alt="" onclick="deleteFeed(${feed['feedId']})">
                                 <img class="icon-end-edit" src="static/assets/img/done.png" alt="">
                             </div>
                             <hr>
@@ -608,9 +619,6 @@
 
                             <li>
                                 <div class="header-icons">
-                                    <a class="shopping-cart" href="#">
-                                        1000 <i class="fab fa-bitcoin"></i>
-                                    </a>
                                     <a class="mobile-hide search-bar-icon" href="#">
                                         <i class="fas fa-search"></i>
                                     </a>
