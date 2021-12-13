@@ -212,7 +212,7 @@
 
             $.ajax({
                 type: "POST",
-                url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}/certi`,
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}/certi`,
                 data: form_data,
                 cache: false,
                 contentType: false,
@@ -230,7 +230,7 @@
         function getCertification() {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}/certis`,
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}/certis`,
                 data: {},
                 success: function (certifications) {
                     showCertification(certifications);
@@ -241,7 +241,7 @@
         function getChallenge() {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}`,
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}`,
                 data: {},
                 success: function (response) {
                     let challenge = response;
@@ -266,7 +266,7 @@
             } else if (localStorage.getItem("token") != null) {
                 $.ajax({
                     type: "GET",
-                    url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}/user`,
+                    url: `http://localhost:8080/challenges/${CHALLENGE_ID}/user`,
                     data: {},
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
@@ -393,7 +393,7 @@
             if (flag) {
                 $.ajax({
                     type: "POST",
-                    url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}/join`,
+                    url: `http://localhost:8080/challenges/${CHALLENGE_ID}/join`,
                     data: {},
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
@@ -414,7 +414,7 @@
             if (flag) {
                 $.ajax({
                     type: "PUT",
-                    url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}/join`,
+                    url: `http://localhost:8080/challenges/${CHALLENGE_ID}/join`,
                     data: {},
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
@@ -431,7 +431,7 @@
         function showDetail(challenge) {
             let temp_html = `<div class="col-md-5">
                                 <div class="single-product-img">
-                                    <img src="${challenge['imgLink']}" alt="">
+                                    <img src="${challenge['imgUrl']}" alt="">
                                 </div>
                             </div>
                             <div class="col-md-7">
@@ -494,7 +494,7 @@
         function deleteCertification(challengeId, certiId) {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/user/certi/${certiId}`,
+                url: `http://localhost:8080/user/certi/${certiId}`,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -504,7 +504,7 @@
                         if (agree) {
                             $.ajax({
                                 type: "DELETE",
-                                url: `https://api.fevertime.shop/challenges/${challengeId}/certis/${certiId}`,
+                                url: `http://localhost:8080/challenges/${challengeId}/certis/${certiId}`,
                                 beforeSend: function (xhr) {
                                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                                 },
@@ -526,7 +526,7 @@
             for (let i = 0; i < certifications.length; i++) {
                 let temp_html = `<div class="card-check" onclick="openModal(${certifications[i]['certificationId']})">
                                     <div class="card-header">
-                                        <img src="${certifications[i]['imgLink']}" alt=""/>
+                                        <img src="${certifications[i]['imgUrl']}" alt=""/>
                                     </div>
                                     <div class="card-mid">
                                         <h5 class="join_title">${certifications[i]['contents']}</h5>
@@ -550,7 +550,7 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <div>
-                                                            <img src="${certifications[i]['imgLink']}" alt="" class="row-cols-6" style="margin: 0 auto; float: none; display: flex; margin-bottom: 50px"/>
+                                                            <img src="${certifications[i]['imgUrl']}" alt="" class="row-cols-6" style="margin: 0 auto; float: none; display: flex; margin-bottom: 50px"/>
                                                         </div>
                                                         <div style="margin-bottom: 20px; border: #0c5460">
                                                             <p style="font-size: large; font-weight: bolder">챌린지 인증 날짜</p>
