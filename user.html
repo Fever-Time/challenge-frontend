@@ -100,7 +100,7 @@
         function getUserInfo() {
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8080/user",
+                url: "https://api.fevertime.shop/user",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -121,7 +121,7 @@
         function getJoinChallenges() {
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8080/user/challenges/join",
+                url: "https://api.fevertime.shop/user/challenges/join",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -152,7 +152,7 @@
         function getCreatedChallenge() {
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8080/user/challenges/create",
+                url: "https://api.fevertime.shop/user/challenges/create",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -183,7 +183,7 @@
         function getCreatedFeed() {
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8080/user/feeds",
+                url: "https://api.fevertime.shop/user/feeds",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -221,7 +221,7 @@
 
             $.ajax({
                 type: "PUT",
-                url: "http://localhost:8080/user/img",
+                url: "https://api.fevertime.shop/user/img",
                 data: form_data,
                 cache: false,
                 contentType: false,
@@ -250,7 +250,7 @@
 
             $.ajax({
                 type: "PUT",
-                url: "http://localhost:8080/user/name",
+                url: "https://api.fevertime.shop/user/name",
                 data: form_data,
                 cache: false,
                 contentType: false,
