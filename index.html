@@ -110,7 +110,7 @@
         function getChallenges(kind) {
             $.ajax({
                 type: "GET",
-                url: "https://api.fevertime.shop/challenges",
+                url: "http://localhost:8080/challenges",
                 data: {"kind": kind},
                 success: function (response) {
                     showChallenges(response)
@@ -119,7 +119,8 @@
         }
 
         function showChallenges(challenges) {
-            if (challenges.length == 0) {
+            console.log(challenges);
+            if (challenges.length === 0) {
                 $('#no_challenge').show()
                 $('#challenge-list').empty()
                 return
@@ -131,7 +132,7 @@
                 let id = challenges[i]['challengeId'];
                 let title = challenges[i]['title'];
                 // let desc = challenges[i]['description'];
-                let img = challenges[i]['imgLink'];
+                let img = challenges[i]['imgUrl'];
                 let start = challenges[i]['startDate'];
                 let end = challenges[i]['endDate'];
                 let limitPerson = challenges[i]['limitPerson'];
@@ -191,7 +192,7 @@
                 // 챌린지 생성 3개 제한
                 $.ajax({
                     type: "GET",
-                    url: "https://api.fevertime.shop/user/challenges/create",
+                    url: "http://localhost:8080/user/challenges/create",
                     data: {},
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
@@ -220,7 +221,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "https://api.fevertime.shop/challenges/search",
+                url: "http://localhost:8080/challenges/search",
                 data: {"search": search},
                 success: function (response) { // 성공하면
                     $(".search-area").toggleClass("search-active")
