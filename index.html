@@ -110,8 +110,8 @@
         function getChallenges(kind) {
             $.ajax({
                 type: "GET",
-                url: "https://api.fevertime.shop/challenges",
-                data: {"kind": kind},
+                url: `https://api.fevertime.shop/challenges?kind=${kind}`,
+                data: {},
                 success: function (response) {
                     showChallenges(response)
                 }
