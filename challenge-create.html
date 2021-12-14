@@ -112,6 +112,12 @@
             let address = $('#sample5_address').val()
             let locationType = $('input[name="addType"]:checked').val();
             let limitPerson = $("#max-people").val();
+            let challengeProgress = "";
+            if (startDate > endDate) {
+                challengeProgress = "STOP"
+            } else {
+                challengeProgress = "INPROGRESS"
+            }
             console.log("카테고리" + category);
 
             if (title == "" || title.trim().length == 0) {
@@ -139,7 +145,8 @@
                 return $('#sample5_address').focus();
             }
 
-            let form_data = new FormData()
+
+            let form_data = new FormData();
             form_data.append("image", image)
             form_data.append("title", title)
             form_data.append("description", desc)
@@ -149,10 +156,12 @@
             form_data.append("category", category)
             form_data.append("locationType", locationType)
             form_data.append("limitPerson", limitPerson)
+            form_data.append("challengeProgress", challengeProgress)
+
 
             $.ajax({
                 type: "POST",
-                url: "https://api.fevertime.shop/challenge",
+                url: "http://localhost:8080/challenge",
                 data: form_data,
                 cache: false,
                 contentType: false,
