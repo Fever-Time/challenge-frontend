@@ -169,7 +169,7 @@
         function plusButton(id, endDate) {
             let nowDate = new Date()
 
-            if (nowDate > endDate) {
+            if (nowDate > endDate.setHours(23,59,59)) {
                 let temp_html = `<a class="cart-btn btnp" onclick="location.href='challenge-detail.html?challengeId=${id}'">
                     <i class="fas fa-bolt"></i>챌린지 기간 종료
                 </a>
