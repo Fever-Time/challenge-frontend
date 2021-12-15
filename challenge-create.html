@@ -112,12 +112,7 @@
             let address = $('#sample5_address').val()
             let locationType = $('input[name="addType"]:checked').val();
             let limitPerson = $("#max-people").val();
-            let challengeProgress = "";
-            if (startDate > endDate) {
-                challengeProgress = "STOP"
-            } else {
-                challengeProgress = "INPROGRESS"
-            }
+
             console.log("카테고리" + category);
 
             if (title == "" || title.trim().length == 0) {
@@ -156,7 +151,7 @@
             form_data.append("category", category)
             form_data.append("locationType", locationType)
             form_data.append("limitPerson", limitPerson)
-            form_data.append("challengeProgress", challengeProgress)
+
 
 
             $.ajax({
