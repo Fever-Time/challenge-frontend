@@ -18,7 +18,6 @@
     <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
     <!-- fontawesome -->
     <link rel="stylesheet" href="./static/assets/css/all.min.css">
-    <script src="https://use.fontawesome.com/7c27437cf7.js"></script>
     <!-- bootstrap -->
     <link rel="stylesheet" href="./static/assets/bootstrap/css/bootstrap.min.css">
     <!-- owl carousel -->
@@ -92,6 +91,7 @@
     <script>
         $(document).ready(function () {
             getChallenges("All");
+            loginStatus();
             $("input:button[name='button']").on('click', function () {
                 getChallenges($(this).val());
             });
@@ -169,7 +169,7 @@
         function plusButton(id, endDate) {
             let nowDate = new Date()
 
-            if (nowDate > endDate.setHours(23,59,59)) {
+            if (nowDate > endDate.setHours(23, 59, 59)) {
                 let temp_html = `<a class="cart-btn btnp" onclick="location.href='challenge-detail.html?challengeId=${id}'">
                     <i class="fas fa-bolt"></i>챌린지 기간 종료
                 </a>
@@ -183,6 +183,22 @@
                 $(`#${id}-check-challenge`).append(temp_html);
             }
 
+        }
+
+        //로그인되어있을때는 로그아웃 버튼 보이기
+        function loginStatus() {
+            if (localStorage.getItem("token") == null) {
+                $('#logout').hide();
+                $('#login').show();
+            } else {
+                $('#login').hide();
+                $('#logout').show();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("token");
+            location.href = "index.html";
         }
 
         function onClickCreateChallenge() {
@@ -273,10 +289,12 @@
                                 <a href="feed.html">Feed</a>
                             </li>
                             <li>
-                                <a href="#" style="margin-right: 110px">User</a>
+                                <a href="#" style="margin-right: 150px">User</a>
                                 <ul class="sub-menu">
                                     <li><a href="#" onclick="onClickMyPage()">My Page</a></li>
-                                    <li><a href="#" data-toggle="modal" data-target="#exampleModal">Login</a></li>
+                                    <li id="login"><a href="#" data-toggle="modal"
+                                                      data-target="#exampleModal">Login</a></li>
+                                    <li id="logout"><a href="#" onclick="logout()">Logout</a></li>
                                 </ul>
                             </li>
 

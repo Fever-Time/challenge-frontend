@@ -242,6 +242,7 @@
     <script>
         $(document).ready(function () {
             getFeeds();
+            loginStatus();
 
             $.ajaxSetup({
                 error: function (jqXHR, exception) {
@@ -253,6 +254,22 @@
                 }
             });
         });
+
+        //로그인되어있을때는 로그아웃 버튼 보이기
+        function loginStatus() {
+            if (localStorage.getItem("token") == null) {
+                $('#logout').hide();
+                $('#login').show();
+            } else {
+                $('#login').hide();
+                $('#logout').show();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("token");
+            location.href = "index.html";
+        }
 
         function getFeeds() {
             $.ajax({
@@ -611,10 +628,12 @@
                                 <a href="feed.html">Feed</a>
                             </li>
                             <li>
-                                <a href="#">User</a>
+                                <a href="#" style="margin-right: 150px" >User</a>
                                 <ul class="sub-menu">
                                     <li><a href="#" onclick="onClickMyPage()">My Page</a></li>
-                                    <li><a href="#" data-toggle="modal" data-target="#exampleModal">Login</a></li>
+                                    <li id="login"><a href="#" data-toggle="modal"
+                                                      data-target="#exampleModal">Login</a></li>
+                                    <li id="logout"><a href="#" onclick="logout()">Logout</a></li>
                                 </ul>
                             </li>
 
