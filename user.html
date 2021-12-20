@@ -165,12 +165,13 @@
 
                         let temp_html = `
                                              <tbody>
-                                                <tr class="table-body-row" onclick="location.href='challenge-detail.html?challengeId=${challengeId}'">
-                                                    <td class="product-name">${title}</td>
-                                                    <td class="product-price">
+                                                <tr class="table-body-row">
+                                                    <td class="product-name" onclick="location.href='challenge-detail.html?challengeId=${challengeId}'">${title}</td>
+                                                    <td class="product-price" onclick="location.href='challenge-detail.html?challengeId=${challengeId}'">
                                                         <i class="far fa-calendar-alt"></i>
                                                         ${startDate} ~ ${endDate}
                                                     </td>
+                                                     <td class="product-name"><button type="button" class="btn btn-danger" onclick="deleteChallenge(${challengeId})">삭제</button></td>
                                                 </tr>
                                                 </tbody>`
                         $('#createChallenge').append(temp_html);
@@ -240,6 +241,23 @@
                 success: function (response) { // 성공하면
                     alert(response['msg']);
                     window.location.reload();
+                }
+            })
+        }
+
+        function deleteChallenge(challengeId) {
+            $.ajax({
+                type: "DELETE",
+                url: `https://api.fevertime.shop/challenges/${challengeId}`,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    alert("챌린지가 삭제되었습니다.");
+                    window.location.reload();
+                },
+                error: function (request, status, error) {
+                    alert("본인외의 참가자가 있어 삭제할 수 없습니다."); // 실패 시 처리
                 }
             })
         }
@@ -408,6 +426,7 @@
                                                 <tr class="table-head-row">
                                                     <th class="product-name">Challenge Title</th>
                                                     <th class="product-price">Challenge Period</th>
+                                                    <th class="product-price"></th>
                                                 </tr>
                                                 </thead>
                                             </table>
