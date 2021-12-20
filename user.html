@@ -208,35 +208,8 @@
             })
         }
 
-        function updateUserImg() {
+        function updateUser() {
             let image = $('#formFile')[0].files[0]
-
-            if (image == null) {
-                alert("사진을 첨부하세요.")
-                return
-            }
-
-            let form_data = new FormData()
-            form_data.append("image", image)
-
-            $.ajax({
-                type: "PUT",
-                url: "https://api.fevertime.shop/user/img",
-                data: form_data,
-                cache: false,
-                contentType: false,
-                processData: false,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-                },
-                success: function (response) { // 성공하면
-                    alert(response['msg']);
-                    window.location.reload();
-                }
-            })
-        }
-
-        function updateUsername() {
             let username = $('#inputUsername').val()
             let str_length = username.length //이름 길이
 
@@ -244,13 +217,19 @@
                 alert("1~8자 사이로 입력하세요.")
                 return
             }
+            console.log(image)
 
+            if (image == undefined) {
+                image = null;
+            }
             let form_data = new FormData()
+            form_data.append("image", image)
             form_data.append("username", username)
+
 
             $.ajax({
                 type: "PUT",
-                url: "https://api.fevertime.shop/user/name",
+                url: "https://api.fevertime.shop/user",
                 data: form_data,
                 cache: false,
                 contentType: false,
@@ -486,7 +465,7 @@
                         <label for="inputUsername"></label><input type="file" id="formFile" style="width: 190px;"
                                                                   onchange="setThumbnail(event);">
                         <button type="button" class="btn btn-outline-light" style="background-color: #F28123"
-                                onclick="updateUserImg()">변경
+                                onclick="updateUser()">변경
                         </button>
                     </div>
                 </form>
@@ -500,7 +479,7 @@
                                                                       onkeyup="noSpaceForm(this);">
                         </div>
                         <button type="button" class="btn btn-outline-light" style="background-color: #F28123"
-                                onclick="updateUsername()">변경
+                                onclick="updateUser()">변경
                         </button>
                     </form>
                 </div>

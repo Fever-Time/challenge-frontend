@@ -242,6 +242,7 @@
     <script>
         $(document).ready(function () {
             getFeeds();
+            loginStatus();
 
             $.ajaxSetup({
                 error: function (jqXHR, exception) {
@@ -254,6 +255,22 @@
             });
         });
 
+        //로그인되어있을때는 로그아웃 버튼 보이기
+        function loginStatus() {
+            if (localStorage.getItem("token") == null) {
+                $('#logout').hide();
+                $('#login').show();
+            } else {
+                $('#login').hide();
+                $('#logout').show();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("token");
+            location.href = "index.html";
+        }
+
         function getFeeds() {
             $.ajax({
                 type: "GET",
@@ -261,7 +278,6 @@
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
                     for (let i = 0; i < response.length; i++) {
-                        console.log(response[i])
                         makeListPost(response[i]);
                         getComments(response[i]['feedId']);
                     }
@@ -277,6 +293,7 @@
                 success: function (response) {
                     for (let i = 0; i < response.length; i++) {
                         makeListComment(response[i], feedId);
+                        getChildComments(feedId, response[i]['commentId'], 0)
                     }
                 }
             })
@@ -363,6 +380,91 @@
             })
         }
 
+        //대댓글 작성
+        function createChildComment(username, commentId, feedId, depth) {
+            //대댓글 입력 폼 보이기
+            let temp_html = `
+                        <div class="alert alert-light" role="alert" style="width: ${525 - 35 * depth}px;margin-left: auto;">
+                                    <div style="text-align: right">
+                                        <div class="input-group" style="height: 36px;width: ${490 - 35 * depth}px">
+                                        <img src="static/assets/img/comment2.png" style="width: 18px;height: 18px;margin: 10px 10px 0 0" class="icon-start-edit">
+                                            <input type="text" class="form-control commenet"
+                                                   aria-label="Recipient's username" aria-describedby="basic-addon2" id="${feedId}-child-val" placeholder="${username}님에게 댓글 달기">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary comment2" type="button" onclick="writeChildComment(${commentId}, ${feedId})">입력</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+            `
+            $(`#${commentId}-child`).append(temp_html);
+
+        }
+
+        function writeChildComment(commentId, feedId) {
+            let comment = {"contents": $(`#${feedId}-child-val`).val()}
+            if (comment['contents'].trim().length === 0) {
+                alert("공백으로 댓글을 작성할 수 없습니다.");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: `https://api.fevertime.shop/feeds/${feedId}/comment/${commentId}`,
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(comment),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                },
+                success: function (response) {
+                    alert("댓글 등록 완료 !!");
+                    window.location.reload();
+                }
+            })
+
+        }
+
+        function getChildComments(feedId, commentId, depth) {
+            $.ajax({
+                type: "GET",
+                url: `https://api.fevertime.shop/feeds/${feedId}/comments/${commentId}`,
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    for (let i = 0; i < response.length; i++) {
+                        let comment = response[i];
+                        let date = comment['lastModifiedDate'].replace("T", "  ").substring(0, comment['lastModifiedDate'].indexOf(".") - 2);
+                        let tempHtml = `
+                                <div class="alert alert-light" role="alert" style="width: ${525 - 35 * depth}px;margin-left: auto;">
+                                    <div style="text-align: left">
+                                    <img src="static/assets/img/comment2.png" style="width: 18px;height: 18px;margin: 5px 10px 10px 0;float: left;" class="icon-start-edit">
+                                        <p style="margin-bottom: 5px; width: 450px"><b>${comment['username']}</b>
+                                        <span class="date">${date}&nbsp;
+                                            <img class="icon-start-edit" src="static/assets/img/edit.png" style="width: 15px" alt="" onclick="editOpen(${comment['commentId']},'${comment['contents']}')"> &nbsp;
+                                            <img class="icon-delete" src="static/assets/img/delete.png" style="width: 13px" onclick="deleteComment(${comment['commentId']},${feedId})" alt="">
+                                            <img class="icon-delete" src="static/assets/img/comment.png" style="width: 16px; margin-left: 7px" onclick="createChildComment('${comment['username']}',${comment['commentId']},${feedId},${depth + 1}); this.onclick=null;" alt="">
+                                        </span></p>
+                                        <span id="${comment['commentId']}-comment">${comment['contents']}</span>
+                                        <div class="input-group" style="height: 36px;width: ${490 - 35 * depth} ;display: none" id='${comment['commentId']}-edit'>
+                                            <input type="text" class="form-control commenet"
+                                                   aria-label="Recipient's username" aria-describedby="basic-addon2" id="${comment['commentId']}-contents">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary comment2" type="button" onclick="editComment(${comment['commentId']},${feedId})">수정</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 대댓글 -->
+                                <div id="${comment['commentId']}-child">
+                                </div>
+                            `
+                        $(`#${commentId}-child`).append(tempHtml);
+                        getChildComments(feedId, comment['commentId'], depth + 1)
+                    }
+                }
+            })
+        }
+
+
         function makeListComment(comment, feedId) {
             let date = comment['lastModifiedDate'].replace("T", "  ").substring(0, comment['lastModifiedDate'].indexOf(".") - 2);
             let tempHtml = `
@@ -372,6 +474,7 @@
                                         <span class="date">${date}&nbsp;
                                             <img class="icon-start-edit" src="static/assets/img/edit.png" style="width: 15px" alt="" onclick="editOpen(${comment['commentId']},'${comment['contents']}')"> &nbsp;
                                             <img class="icon-delete" src="static/assets/img/delete.png" style="width: 13px" onclick="deleteComment(${comment['commentId']},${feedId})" alt="">
+                                            <img class="icon-delete" src="static/assets/img/comment.png" style="width: 16px; margin-left: 7px" onclick="createChildComment('${comment['username']}',${comment['commentId']},${feedId},0); this.onclick=null;" alt="">
                                         </span></p>
                                         <span id="${comment['commentId']}-comment">${comment['contents']}</span>
                                         <div class="input-group" style="height: 36px;width: 520px ;display: none" id='${comment['commentId']}-edit'>
@@ -382,6 +485,9 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <!-- 대댓글 -->
+                                <div id="${comment['commentId']}-child">
                                 </div>
                             `
             $(`#${feedId}-comment-area`).append(tempHtml);
@@ -611,10 +717,12 @@
                                 <a href="feed.html">Feed</a>
                             </li>
                             <li>
-                                <a href="#">User</a>
+                                <a href="#" style="margin-right: 150px">User</a>
                                 <ul class="sub-menu">
                                     <li><a href="#" onclick="onClickMyPage()">My Page</a></li>
-                                    <li><a href="#" data-toggle="modal" data-target="#exampleModal">Login</a></li>
+                                    <li id="login"><a href="#" data-toggle="modal"
+                                                      data-target="#exampleModal">Login</a></li>
+                                    <li id="logout"><a href="#" onclick="logout()">Logout</a></li>
                                 </ul>
                             </li>
 

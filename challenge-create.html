@@ -112,9 +112,13 @@
             let address = $('#sample5_address').val()
             let locationType = $('input[name="addType"]:checked').val();
             let limitPerson = $("#max-people").val();
+
             console.log("카테고리" + category);
 
-            if (title == "" || title.trim().length == 0) {
+            if (image == undefined) {
+                alert("챌린지 이미지를 첨부하세요.")
+                return $('#title').focus();
+            } else if (title == "" || title.trim().length == 0) {
                 alert('챌린지 이름을 입력하세요')
                 return $('#title').focus();
             } else if (desc == "" || desc.trim().length == 0) {
@@ -129,17 +133,13 @@
             } else if (limitPerson < 1 || limitPerson > 33) {
                 alert("1~33명 범위로 입력해 주십시오.");
                 return $('#max-people').focus();
-            } else if (image == null) {
-                alert('이미지을 첨부하세요')
-                return
-            }
-
-            if (locationType == "OFFLINE" && $('#sample5_address').val() == "") {
+            } else if (locationType == "OFFLINE" && $('#sample5_address').val() == "") {
                 alert("오프라인 장소를 입력해주세요.")
                 return $('#sample5_address').focus();
             }
 
-            let form_data = new FormData()
+
+            let form_data = new FormData();
             form_data.append("image", image)
             form_data.append("title", title)
             form_data.append("description", desc)
@@ -149,6 +149,7 @@
             form_data.append("category", category)
             form_data.append("locationType", locationType)
             form_data.append("limitPerson", limitPerson)
+
 
             $.ajax({
                 type: "POST",
@@ -322,7 +323,7 @@
                 <div class="single-product-img">
                     <img id="thumbnail"
                          style="height: 300px;width:500px"
-                         src="https://dybzsbdm9g4zq.cloudfront.net/default-challenge-img.jfif"
+                         src="https://fever-prac.s3.ap-northeast-2.amazonaws.com/challenge/challenge.jfif"
                          alt="">
                 </div>
             </div>
