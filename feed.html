@@ -382,6 +382,10 @@
 
         //대댓글 작성
         function createChildComment(username, commentId, feedId, depth) {
+            if ((525 - 35 * depth) < 300) {
+                alert("대댓글 그만~!")
+                return
+            }
             //대댓글 입력 폼 보이기
             let temp_html = `
                         <div class="alert alert-light" role="alert" style="width: ${525 - 35 * depth}px;margin-left: auto;">
