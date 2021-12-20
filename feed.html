@@ -293,7 +293,7 @@
                 success: function (response) {
                     for (let i = 0; i < response.length; i++) {
                         makeListComment(response[i], feedId);
-                        getChildComments(feedId, response[i]['commentId'])
+                        getChildComments(feedId, response[i]['commentId'], 0)
                     }
                 }
             })
@@ -381,12 +381,12 @@
         }
 
         //대댓글 작성
-        function createChildComment(username, commentId, feedId) {
+        function createChildComment(username, commentId, feedId, depth) {
             //대댓글 입력 폼 보이기
             let temp_html = `
-                        <div class="alert alert-light" role="alert" style="width: 510px;margin-left: auto;">
+                        <div class="alert alert-light" role="alert" style="width: ${525 - 35 * depth}px;margin-left: auto;">
                                     <div style="text-align: right">
-                                        <div class="input-group" style="height: 36px;width: 470px">
+                                        <div class="input-group" style="height: 36px;width: ${490 - 35 * depth}px">
                                         <img src="static/assets/img/comment2.png" style="width: 18px;height: 18px;margin: 10px 10px 0 0" class="icon-start-edit">
                                             <input type="text" class="form-control commenet"
                                                    aria-label="Recipient's username" aria-describedby="basic-addon2" id="${feedId}-child-val" placeholder="${username}님에게 댓글 달기">
@@ -424,7 +424,7 @@
 
         }
 
-        function getChildComments(feedId, commentId) {
+        function getChildComments(feedId, commentId, depth) {
             $.ajax({
                 type: "GET",
                 url: `https://api.fevertime.shop/feeds/${feedId}/comments/${commentId}`,
@@ -434,16 +434,17 @@
                         let comment = response[i];
                         let date = comment['lastModifiedDate'].replace("T", "  ").substring(0, comment['lastModifiedDate'].indexOf(".") - 2);
                         let tempHtml = `
-                                <div class="alert alert-light" role="alert" style="width: 510px;margin-left: auto;">
+                                <div class="alert alert-light" role="alert" style="width: ${525 - 35 * depth}px;margin-left: auto;">
                                     <div style="text-align: left">
-                                    <img src="static/assets/img/comment2.png" style="width: 18px;height: 18px;margin: 5px 10px 50px 0;float: left;" class="icon-start-edit">
+                                    <img src="static/assets/img/comment2.png" style="width: 18px;height: 18px;margin: 5px 10px 10px 0;float: left;" class="icon-start-edit">
                                         <p style="margin-bottom: 5px; width: 450px"><b>${comment['username']}</b>
                                         <span class="date">${date}&nbsp;
                                             <img class="icon-start-edit" src="static/assets/img/edit.png" style="width: 15px" alt="" onclick="editOpen(${comment['commentId']},'${comment['contents']}')"> &nbsp;
                                             <img class="icon-delete" src="static/assets/img/delete.png" style="width: 13px" onclick="deleteComment(${comment['commentId']},${feedId})" alt="">
+                                            <img class="icon-delete" src="static/assets/img/comment.png" style="width: 16px; margin-left: 7px" onclick="createChildComment('${comment['username']}',${comment['commentId']},${feedId},${depth + 1}); this.onclick=null;" alt="">
                                         </span></p>
                                         <span id="${comment['commentId']}-comment">${comment['contents']}</span>
-                                        <div class="input-group" style="height: 36px;width: 490px ;display: none" id='${comment['commentId']}-edit'>
+                                        <div class="input-group" style="height: 36px;width: ${490 - 35 * depth} ;display: none" id='${comment['commentId']}-edit'>
                                             <input type="text" class="form-control commenet"
                                                    aria-label="Recipient's username" aria-describedby="basic-addon2" id="${comment['commentId']}-contents">
                                             <div class="input-group-append">
@@ -457,6 +458,7 @@
                                 </div>
                             `
                         $(`#${commentId}-child`).append(tempHtml);
+                        getChildComments(feedId, comment['commentId'], depth + 1)
                     }
                 }
             })
@@ -472,7 +474,7 @@
                                         <span class="date">${date}&nbsp;
                                             <img class="icon-start-edit" src="static/assets/img/edit.png" style="width: 15px" alt="" onclick="editOpen(${comment['commentId']},'${comment['contents']}')"> &nbsp;
                                             <img class="icon-delete" src="static/assets/img/delete.png" style="width: 13px" onclick="deleteComment(${comment['commentId']},${feedId})" alt="">
-                                            <img class="icon-delete" src="static/assets/img/comment.png" style="width: 16px; margin-left: 7px" onclick="createChildComment('${comment['username']}',${comment['commentId']},${feedId}); this.onclick=null;" alt="">
+                                            <img class="icon-delete" src="static/assets/img/comment.png" style="width: 16px; margin-left: 7px" onclick="createChildComment('${comment['username']}',${comment['commentId']},${feedId},0); this.onclick=null;" alt="">
                                         </span></p>
                                         <span id="${comment['commentId']}-comment">${comment['contents']}</span>
                                         <div class="input-group" style="height: 36px;width: 520px ;display: none" id='${comment['commentId']}-edit'>
