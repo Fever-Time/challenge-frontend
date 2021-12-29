@@ -282,19 +282,19 @@
         }
 
         let stompClient = null;
-        let userId = localStorage.getItem('username');
+        let userOwn = localStorage.getItem('username');
         function onSocket() {
             let socket = new SockJS('https://api.fevertime.shop/websocket');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
                 console.log('Connected: ' + frame);
-                stompClient.subscribe(`/topic/feed/${userId}`, function (greeting) {
+                stompClient.subscribe(`/topic/feed/${userOwn}`, function (greeting) {
                     toastr.info(greeting.body.split('"')[3], {timeOut: 1000});
                 });
             });
         }
 
-        function sendMsg(feedId) {
+        function sendMsg(feedId, userId) {
             $.ajax({
                 type: "GET",
                 url: `https://api.fevertime.shop/feeds/${feedId}/comments`,
@@ -584,8 +584,9 @@
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
                 success: function (response) {
+                    let userId = response['userId'];
                     alert("댓글 등록 완료 !!");
-                    sendMsg(feedId);
+                    sendMsg(feedId, userId);
                     window.location.reload();
                 }
             })
