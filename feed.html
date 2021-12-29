@@ -32,9 +32,18 @@
     <link rel="stylesheet" href="./static/assets/css/main.css">
     <!-- responsive -->
     <link rel="stylesheet" href="./static/assets/css/responsive.css">
+    <!-- toastr css 라이브러리 -->
+    <link rel="stylesheet" type="text/css"
+          href="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css"/>
 
     <!-- jquery -->
     <script src="./static/assets/js/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <!-- toastr js 라이브러리 -->
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- websocket -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.2/sockjs.min.js"></script>
 
     <!-- kakao login-->
     <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
@@ -243,6 +252,7 @@
         $(document).ready(function () {
             getFeeds();
             loginStatus();
+            onSocket();
 
             $.ajaxSetup({
                 error: function (jqXHR, exception) {
@@ -269,6 +279,40 @@
         function logout() {
             localStorage.removeItem("token");
             location.href = "index.html";
+        }
+
+        let stompClient = null;
+        let userId = localStorage.getItem('username');
+        function onSocket() {
+            let socket = new SockJS('https://api.fevertime.shop/websocket');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe(`/topic/feed/${userId}`, function (greeting) {
+                    toastr.info(greeting.body.split('"')[3], {timeOut: 1000});
+                });
+            });
+        }
+
+        function sendMsg(feedId) {
+            $.ajax({
+                type: "GET",
+                url: `https://api.fevertime.shop/feeds/${feedId}/comments`,
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+
+                    console.log(typeof response[0]['contents'])
+                    let contents = response[response.length - 1]['contents']
+                    let username = response[response.length - 1]['username']
+
+                    stompClient.send('/pub/post', {}, JSON.stringify({
+                        'msg': `${username}님이 댓글을 작성했습니다 - ${contents} `,
+                        'userId': userId
+                    }));
+
+                }
+            })
+
         }
 
         function getFeeds() {
@@ -319,10 +363,10 @@
                                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                                 },
                                 success: function (response) {
-                                        alert("댓글 삭제 완료 !!");
-                                        window.location.reload();
+                                    alert("댓글 삭제 완료 !!");
+                                    window.location.reload();
                                 },
-                                error:function(request,status,error){
+                                error: function (request, status, error) {
                                     alert("대댓글이 있는 댓글은 삭제 불가 !!"); // 실패 시 처리
                                 }
                             });
@@ -516,7 +560,9 @@
                 },
                 success: function (response) {
                     alert("피드 등록 완료 !!");
-                    window.location.reload();
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 500);
 
                 }
             });
@@ -539,6 +585,7 @@
                 },
                 success: function (response) {
                     alert("댓글 등록 완료 !!");
+                    sendMsg(feedId);
                     window.location.reload();
                 }
             })
