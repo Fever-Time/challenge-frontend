@@ -282,29 +282,34 @@
         }
 
         let stompClient = null;
-
+        let userId = localStorage.getItem('username');
         function onSocket() {
             let socket = new SockJS('https://api.fevertime.shop/websocket');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/feed', function (greeting) {
+                stompClient.subscribe(`/topic/feed/${userId}`, function (greeting) {
                     toastr.info(greeting.body.split('"')[3], {timeOut: 1000});
                 });
             });
         }
 
-        function sendMsg() {
+        function sendMsg(feedId) {
             $.ajax({
                 type: "GET",
-                url: "https://api.fevertime.shop/feeds",
+                url: `https://api.fevertime.shop/feeds/${feedId}/comments`,
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
-                    console.log(typeof response[0]['contents'])
-                    let contents = response[0]['contents']
-                    let username = response[0]['username']
 
-                    stompClient.send('/pub/post', {}, JSON.stringify({'msg': `${username}님이 피드를 작성했습니다 - ${contents} `}));
+                    console.log(typeof response[0]['contents'])
+                    let contents = response[response.length - 1]['contents']
+                    let username = response[response.length - 1]['username']
+
+                    stompClient.send('/pub/post', {}, JSON.stringify({
+                        'msg': `${username}님이 댓글을 작성했습니다 - ${contents} `,
+                        'userId': userId
+                    }));
+
                 }
             })
 
@@ -555,7 +560,6 @@
                 },
                 success: function (response) {
                     alert("피드 등록 완료 !!");
-                    sendMsg();
                     setTimeout(function () {
                         window.location.reload();
                     }, 500);
@@ -581,6 +585,7 @@
                 },
                 success: function (response) {
                     alert("댓글 등록 완료 !!");
+                    sendMsg(feedId);
                     window.location.reload();
                 }
             })
