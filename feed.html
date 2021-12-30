@@ -291,9 +291,6 @@
                 stompClient.subscribe(`/topic/feed/${userOwn}`, function (greeting) {
                     toastr.info(greeting.body.split('"')[3], {timeOut: 1000});
                 });
-                stompClient.subscribe(`/topic/feed/2008641393`, function (greeting) {
-                    toastr.info(greeting.body.split('"')[3], {timeOut: 1000});
-                });
             });
         }
 
