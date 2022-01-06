@@ -212,7 +212,7 @@
 
             $.ajax({
                 type: "POST",
-                url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}/certi`,
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}/certi`,
                 data: form_data,
                 cache: false,
                 contentType: false,
@@ -230,7 +230,7 @@
         function getCertification() {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}/certis`,
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}/certis`,
                 data: {},
                 success: function (certifications) {
                     showCertification(certifications);
@@ -241,7 +241,7 @@
         function getChallenge() {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}`,
+                url: `http://localhost:8080/challenges/${CHALLENGE_ID}`,
                 data: {},
                 success: function (response) {
                     let challenge = response;
@@ -266,7 +266,7 @@
             } else if (localStorage.getItem("token") != null) {
                 $.ajax({
                     type: "GET",
-                    url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}/user`,
+                    url: `http://localhost:8080/challenges/${CHALLENGE_ID}/user`,
                     data: {},
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
@@ -393,7 +393,7 @@
             if (flag) {
                 $.ajax({
                     type: "POST",
-                    url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}/join`,
+                    url: `http://localhost:8080/challenges/${CHALLENGE_ID}/join`,
                     data: {},
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
@@ -414,7 +414,7 @@
             if (flag) {
                 $.ajax({
                     type: "PUT",
-                    url: `https://api.fevertime.shop/challenges/${CHALLENGE_ID}/join`,
+                    url: `http://localhost:8080/challenges/${CHALLENGE_ID}/join`,
                     data: {},
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
@@ -494,7 +494,7 @@
         function deleteCertification(challengeId, certiId) {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/user/certi/${certiId}`,
+                url: `http://localhost:8080/user/certi/${certiId}`,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -504,7 +504,7 @@
                         if (agree) {
                             $.ajax({
                                 type: "DELETE",
-                                url: `https://api.fevertime.shop/challenges/${challengeId}/certis/${certiId}`,
+                                url: `http://localhost:8080/challenges/${challengeId}/certis/${certiId}`,
                                 beforeSend: function (xhr) {
                                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                                 },

@@ -249,21 +249,41 @@
     </style>
 
     <script>
-        $(document).ready(function () {
-            getFeeds();
-            loginStatus();
-            onSocket();
+        let userOwn = localStorage.getItem('username');
 
-            $.ajaxSetup({
-                error: function (jqXHR, exception) {
-                    switch (jqXHR.status) {
-                        case 401:
-                            alert('로그인을 해주세요.');
-                            break;
-                    }
+        $(document).ready(function () {
+                getFeeds();
+                loginStatus();
+
+                if (localStorage.getItem('token') != null) {
+                    let eventSource = new EventSource(`http://localhost:8080/sub/` + userOwn);
+
+                    eventSource.addEventListener("sse", function (event) {
+                        console.log(event.data);
+                    })
+
+                    eventSource.addEventListener("addComment", function (event) {
+                        let message = event.data;
+                        alert(message);
+                    })
+
+                    eventSource.addEventListener("error", function (event) {
+                        eventSource.close()
+                    })
                 }
-            });
-        });
+
+
+                $.ajaxSetup({
+                    error: function (jqXHR, exception) {
+                        switch (jqXHR.status) {
+                            case 401:
+                                alert('로그인을 해주세요.');
+                                break;
+                        }
+                    }
+                });
+            }
+        );
 
         //로그인되어있을때는 로그아웃 버튼 보이기
         function loginStatus() {
@@ -281,44 +301,10 @@
             location.href = "index.html";
         }
 
-        let stompClient = null;
-        let userOwn = localStorage.getItem('username');
-        function onSocket() {
-            let socket = new SockJS('https://api.fevertime.shop/websocket');
-            stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-                console.log('Connected: ' + frame);
-                stompClient.subscribe(`/topic/feed/${userOwn}`, function (greeting) {
-                    toastr.info(greeting.body.split('"')[3], {timeOut: 1000});
-                });
-            });
-        }
-
-        function sendMsg(feedId, userId) {
-            $.ajax({
-                type: "GET",
-                url: `https://api.fevertime.shop/feeds/${feedId}/comments`,
-                contentType: 'application/json; charset=utf-8',
-                success: function (response) {
-
-                    console.log(typeof response[0]['contents'])
-                    let contents = response[response.length - 1]['contents']
-                    let username = response[response.length - 1]['username']
-
-                    stompClient.send('/pub/post', {}, JSON.stringify({
-                        'msg': `${username}님이 댓글을 작성했습니다 - ${contents} `,
-                        'userId': userId
-                    }));
-
-                }
-            })
-
-        }
-
         function getFeeds() {
             $.ajax({
                 type: "GET",
-                url: "https://api.fevertime.shop/feeds",
+                url: "http://localhost:8080/feeds",
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
                     for (let i = 0; i < response.length; i++) {
@@ -332,7 +318,7 @@
         function getComments(feedId) { // 789
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/feeds/${feedId}/comments`,
+                url: `http://localhost:8080/feeds/${feedId}/comments`,
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
                     for (let i = 0; i < response.length; i++) {
@@ -346,7 +332,7 @@
         function deleteComment(commentId, feedId) {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/user/comment/${commentId}`,
+                url: `http://localhost:8080/user/comment/${commentId}`,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -358,7 +344,7 @@
                         } else {
                             $.ajax({
                                 type: "DELETE",
-                                url: `https://api.fevertime.shop/feeds/${feedId}/comments/${commentId}`,
+                                url: `http://localhost:8080/feeds/${feedId}/comments/${commentId}`,
                                 beforeSend: function (xhr) {
                                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                                 },
@@ -384,7 +370,7 @@
         function editOpen(commentId, content) {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/user/comment/${commentId}`,
+                url: `http://localhost:8080/user/comment/${commentId}`,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -414,7 +400,7 @@
 
             $.ajax({
                 type: "PUT",
-                url: `https://api.fevertime.shop/feeds/${feedId}/comments/${commentId}`,
+                url: `http://localhost:8080/feeds/${feedId}/comments/${commentId}`,
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(contents),
                 beforeSend: function (xhr) {
@@ -461,7 +447,7 @@
 
             $.ajax({
                 type: "POST",
-                url: `https://api.fevertime.shop/feeds/${feedId}/comment/${commentId}`,
+                url: `http://localhost:8080/feeds/${feedId}/comment/${commentId}`,
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(comment),
                 beforeSend: function (xhr) {
@@ -478,7 +464,7 @@
         function getChildComments(feedId, commentId, depth) {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/feeds/${feedId}/comments/${commentId}`,
+                url: `http://localhost:8080/feeds/${feedId}/comments/${commentId}`,
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
                     for (let i = 0; i < response.length; i++) {
@@ -552,7 +538,7 @@
             }
             $.ajax({
                 type: "POST",
-                url: "https://api.fevertime.shop/feed",
+                url: "http://localhost:8080/feed",
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(content),
                 beforeSend: function (xhr) {
@@ -577,7 +563,7 @@
 
             $.ajax({
                 type: "POST",
-                url: `https://api.fevertime.shop/feeds/${feedId}/comment`,
+                url: `http://localhost:8080/feeds/${feedId}/comment`,
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(comment),
                 beforeSend: function (xhr) {
@@ -586,7 +572,6 @@
                 success: function (response) {
                     let userId = response['userId'];
                     alert("댓글 등록 완료 !!");
-                    sendMsg(feedId, userId);
                     window.location.reload();
                 }
             })
@@ -595,7 +580,7 @@
         function deleteFeed(feedId) {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/user/feed/${feedId}`,
+                url: `http://localhost:8080/user/feed/${feedId}`,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -608,7 +593,7 @@
                         } else {
                             $.ajax({
                                 type: "DELETE",
-                                url: `https://api.fevertime.shop/feeds/${feedId}`,
+                                url: `http://localhost:8080/feeds/${feedId}`,
                                 beforeSend: function (xhr) {
                                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                                 },
@@ -628,7 +613,7 @@
         function openModal(feedId) {
             $.ajax({
                 type: "GET",
-                url: `https://api.fevertime.shop/user/feed/${feedId}`,
+                url: `http://localhost:8080/user/feed/${feedId}`,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                 },
@@ -651,7 +636,7 @@
             }
             $.ajax({
                 type: "PUT",
-                url: `https://api.fevertime.shop/feeds/${feedId}`,
+                url: `http://localhost:8080/feeds/${feedId}`,
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(content),
                 beforeSend: function (xhr) {
