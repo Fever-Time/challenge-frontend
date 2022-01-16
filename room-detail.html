@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="도전하고 싶으신가요? 피버타임과 함께하세요 !!">
+
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- title -->
+    <title>피버타임</title>
+
+    <!-- bootstrap css-->
+    <!-- favicon -->
+    <link rel="shortcut icon" type="image/png" href="./static/assets/img/favicon.svg">
+    <!-- google font -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
+    <!-- fontawesome -->
+    <link rel="stylesheet" href="./static/assets/css/all.min.css">
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="./static/assets/bootstrap/css/bootstrap.min.css">
+    <!-- owl carousel -->
+    <link rel="stylesheet" href="./static/assets/css/owl.carousel.css">
+    <!-- magnific popup -->
+    <link rel="stylesheet" href="./static/assets/css/magnific-popup.css">
+    <!-- animate css -->
+    <link rel="stylesheet" href="./static/assets/css/animate.css">
+    <!-- mean menu css -->
+    <link rel="stylesheet" href="./static/assets/css/meanmenu.min.css">
+    <!-- main style -->
+    <link rel="stylesheet" href="./static/assets/css/main.css">
+    <!-- responsive -->
+    <link rel="stylesheet" href="./static/assets/css/responsive.css">
+
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <!-- kakao login-->
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+    <script src="static/assets/js/kakao-login.js"></script>
+
+    <!-- file upload -->
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
+
+    <!-- websocket -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.2/sockjs.min.js"></script>
+
+    <style>
+        .join-form input {
+            height: 40px;
+        }
+
+        .join-form .input-group-text {
+            width: 120px
+        }
+
+        .card-group {
+            width: 1000px;
+            margin: auto auto 50px;
+        }
+
+        .card-header img {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+        }
+
+        .card-mid p {
+            font-size: 13px;
+            margin: 0 0 40px;
+            text-align: center;
+        }
+
+        .center {
+            background-color: whitesmoke;
+            width: 900px;
+            height: 100%;
+            min-height: 700px;
+            border-radius: 20px;
+        }
+    </style>
+    <script>
+        let roomName;
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        let roomId = urlParams.get('roomId')
+
+        let stompClient = null;
+
+        $(document).ready(function () {
+            getRoomInfo()
+            onSocket();
+        })
+
+        //웹소켓연결
+        function onSocket() {
+            let socket = new SockJS('https://api.fevertime.shop/ws-stomp');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function () {
+                stompClient.subscribe('/sub/chat/room/' + roomId, function (chat) {
+                    console.log(chat.body)
+                    let temp = `
+                       <div class="alert alert-info" role="alert">
+                          ${chat.body.split('"')[7]}
+                        </div>`
+                    $("#message").append(temp);
+                });
+                roomEnter();
+            });
+        }
+
+        //입장 메세지 보내기
+        function roomEnter() {
+            stompClient.send("/pub/chat/enter", {}, JSON.stringify({
+                'roomId': roomId, 'message': "입장했습니다."
+            }))
+        }
+
+        //채팅방 정보 가져오기
+        function getRoomInfo() {
+            $.ajax({
+                type: "GET",
+                url: `https://api.fevertime.shop/chat/room/${roomId}`,
+                data: {},
+                success: function (response) {
+                    console.log(response);
+                    roomId = response['roomId'];
+                    roomName = response['name'];
+                    $('#room-name').text(roomName);
+                }
+            });
+        }
+
+        //채팅 전송
+        function msgSend() {
+            let msg = $("#chatMsg").val();
+            console.log(msg)
+            if (msg !== "") {
+                stompClient.send("/pub/chat/message", {}, JSON.stringify({'roomId': roomId, 'message': msg}));
+                $("#chatMsg").val("");
+            }
+        }
+
+        //채팅방 나가기
+        function exitRoom() {
+            stompClient.send("/pub/chat/exit", {}, JSON.stringify({'roomId': roomId, 'message': "퇴장하셨습니다."}));
+            if (stompClient !== null) {
+                stompClient.disconnect();
+            }
+            window.location.href = "chat.html"
+        }
+
+    </script>
+</head>
+<body>
+<!--PreLoader start -->
+<div class="loader">
+    <div class="loader-inner">
+        <div class="circle"></div>
+    </div>
+</div>
+<!--PreLoader end-->
+
+<!-- header start -->
+<div class="top-header-area" id="sticker">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-sm-12 text-center">
+                <div class="main-menu-wrap">
+                    <!-- logo -->
+                    <div class="site-logo" style="padding: 0;">
+                        <a href="index.html">
+                            <img src="./static/assets/img/logo.png" alt="">
+                        </a>
+                    </div>
+                    <!-- logo -->
+
+                    <!-- menu start -->
+                    <nav class="main-menu">
+                        <ul>
+                            <li>
+                                <a href="index.html">Home</a>
+                            </li>
+                            <li>
+                                <a href="feed.html">Feed</a>
+                            </li>
+                            <li class="current-list-item">
+                                <a href="chat.html">Chat</a>
+                            </li>
+                            <li>
+                                <a href="#" style="margin-right: 150px">User</a>
+                                <ul class="sub-menu">
+                                    <li><a href="#" onclick="onClickMyPage()">My Page</a></li>
+                                    <li><a href="#" data-toggle="modal" data-target="#exampleModal">Login</a></li>
+                                </ul>
+                            </li>
+
+                            <li>
+                                <div class="header-icons">
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <div class="mobile-menu"></div>
+                    <!-- menu end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- header end -->
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img onclick="loginWithKakao()" style="cursor:pointer;"
+                     src="static/assets/img/kakao_login_large_wide.png" alt="카카오 로그인"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- search area start-->
+<div class="search-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <span class="close-btn"><i class="fas fa-window-close"></i></span>
+                <div class="search-bar">
+                    <div class="search-bar-tablecell">
+                        <h3>Search For:</h3>
+                        <input type="text" id="search-input" placeholder="Keywords" name="search">
+                        <button type="submit" onclick="getSearchChallenges()">Search <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- search area end -->
+
+<!-- breadcrumb-section start -->
+<div class="breadcrumb-section breadcrumb-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2 text-center">
+                <div style="cursor: pointer;" onclick="location.href='index.html'" class="breadcrumb-text">
+                    <p>습관, 목표 관리 애플리케이션</p>
+                    <h1>피버타임</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- breadcrumb section end -->
+
+<!-- single product -->
+<div class="single-product mt-150 mb-150">
+    <div class="container center">
+        <div class="alert alert-light" role="alert" style="font-weight: bold; text-align: center">
+            채팅 방 : <span id="room-name">name</span>
+        </div>
+        <div id="chatRoom">
+            <div id="message">
+
+            </div>
+            <div class="input-group mb-3" style="width: 500px; margin: 200px auto auto auto">
+                <input type="text" class="form-control" placeholder="메시지를 입력하세요" id="chatMsg">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" onclick="msgSend()">전송</button>
+                    <button type="button" class="btn btn-secondary" style="margin-left: 10px" onclick="exitRoom()">나가기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end single product -->
+
+<div class="card-group" id="card-group">
+
+</div>
+
+
+<!-- copyright start -->
+<div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <p>Copyrights &copy; 2021 - 피버타임, All Rights
+                    Reserved.
+                </p>
+                <!--                <a href="https://imransdesign.com/">Imran Hossain</a> -->
+            </div>
+            <div class="col-lg-6 text-right col-md-12">
+                <div class="social-icons">
+                    <!-- <ul>
+                        <li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
+                    </ul> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- copyright end -->
+
+<script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=7004ea44101be7c75067b28e563db611&libraries=services"></script>
+
+<!-- bootstrap js start -->
+<!-- jquery -->
+<script src="./static/assets/js/jquery-1.11.3.min.js"></script>
+<!-- bootstrap -->
+<script src="./static/assets/bootstrap/js/bootstrap.min.js"></script>
+<!-- count down -->
+<script src="./static/assets/js/jquery.countdown.js"></script>
+<!-- isotope -->
+<script src="./static/assets/js/jquery.isotope-3.0.6.min.js"></script>
+<!-- waypoints -->
+<script src="./static/assets/js/waypoints.js"></script>
+<!-- owl carousel -->
+<script src="./static/assets/js/owl.carousel.min.js"></script>
+<!-- magnific popup -->
+<script src="./static/assets/js/jquery.magnific-popup.min.js"></script>
+<!-- mean menu -->
+<script src="./static/assets/js/jquery.meanmenu.min.js"></script>
+<!-- sticker js -->
+<script src="./static/assets/js/sticker.js"></script>
+<!-- main js -->
+<script src="./static/assets/js/main.js"></script>
+<!-- bootstrap js end -->
+</body>
+</html>

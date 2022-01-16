@@ -41,15 +41,7 @@
     <script src="static/assets/js/kakao-login.js"></script>
 
     <style>
-        #add-btn {
-            background-color: white;
-            border: solid #F28123;
-            color: #F28123;
-        }
-
-        #add-btn:hover {
-            background-color: #F28123;
-            border: solid white;
+        .btn {
             color: white;
         }
 
@@ -62,46 +54,15 @@
             background-color: #4e555b;
         }
 
-        .product-lists {
-            height: auto !important;
-        }
-
         .single-product-item {
             position: relative !important;
-        }
-
-        .btn {
-            margin-right: 10px;
-            width: 80px;
-            height: 50px;
-            font-weight: bold;
-            color: black;
-            font-size: medium;
-            border: black solid 2px;
-            background-color: white;
-            border-radius: 30px;
-        }
-
-        .btn:hover {
-            background-color: #F28123;
-            border: solid white;
-            color: white;
         }
     </style>
     <script>
         $(document).ready(function () {
             loginStatus();
-            $.ajaxSetup({
-                error: function (jqXHR, exception) {
-                    switch (jqXHR.status) {
-                        case 401:
-                            alert('로그인을 해주세요.');
-                            break;
-                    }
-                },
-            });
+            getAllRooms();
         })
-
 
 
         //로그인되어있을때는 로그아웃 버튼 보이기
@@ -126,6 +87,60 @@
             } else {
                 location.href = "user.html";
             }
+        }
+
+        //채팅방 리스트 조회
+        function getAllRooms() {
+            $.ajax({
+                    type: "GET",
+                    url: `https://api.fevertime.shop/chat/rooms`,
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (response) {
+                        console.log(response)
+                        let all_rooms = response;
+                        for (let i = 0; i < all_rooms.length; i++) {
+                            let idx = all_rooms[i]['roomId'];
+                            let name = all_rooms[i]['name'];
+                            let date = all_rooms[i]['createdDate']
+
+                            let temp_html = `<div class="card border-dark mb-3"
+                 style="max-width: 18rem;margin-left: 100px;margin-top: 50px;width: 250px;height: 215px">
+                <div class="card-header">개설일 : ${date}</div>
+                <div class="card-body text-dark">
+                    <h5 class="card-title">${name}</h5>
+                    <p class="card-text">참여인원 : 0명</p>
+                    <button type="button" class="btn" style="background-color: #F28123;border-color: #F28123"
+                            onclick="location.href='room-detail.html?roomId=${idx}'">참가하기
+                    </button>
+                </div>
+            </div>`;
+                            $('#room-list').append(temp_html)
+                        }
+                    }
+                }
+            )
+        }
+
+        //채팅방 개설
+        function createRoom() {
+            let name = $('#room_name').val()
+            if (name !== "") {
+                $.ajax({
+                    type: "POST",
+                    url: `https://api.fevertime.shop/chat/room`,
+                    contentType: "application/json",
+                    data: JSON.stringify(name),
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                    },
+                    success: function (response) {
+                        window.location.reload();
+                    }
+                });
+            } else {
+                alert("채팅방 이름을 입력하세요");
+            }
+
         }
     </script>
 </head>
@@ -155,14 +170,14 @@
                     <!-- menu start -->
                     <nav class="main-menu">
                         <ul>
-                            <li class="current-list-item">
+                            <li>
                                 <a href="index.html">Home</a>
                             </li>
                             <li>
                                 <a href="feed.html">Feed</a>
                             </li>
-                            <li>
-                                <a href="Chat.html">Chat</a>
+                            <li class="current-list-item">
+                                <a href="chat.html">Chat</a>
                             </li>
                             <li>
                                 <a href="#" style="margin-right: 150px">User</a>
@@ -253,16 +268,16 @@
 <!-- features list section -->
 <div class="list-section" style="padding: 60px">
     <div class="container">
-        <h4 style="margin-bottom: 40px">피버타임 규칙</h4>
-        <div>
-            <h5><i class="fa fa-check" aria-hidden="true" style="margin: 10px;color: #F28123;"></i>챌린지는 1인당 3개까지 생성
-                가능합니다
-            </h5>
-        </div>
-        <div>
-            <h5><i class="fa fa-check" aria-hidden="true" style="margin: 10px;color: #F28123;"></i>챌린지별 인증은 하루에 한번만 할 수
-                있습니다
-            </h5>
+        <h4 style="margin-bottom: 40px">채팅방 개설</h4>
+        <div class="input-group mb-3">
+            <input id="room_name" type="text" class="form-control" placeholder="개설 할 채팅 방의 이름을 입력하세요."
+                   aria-label="Recipient's username" aria-describedby="basic-addon2"
+                   style="height: 49.5px;">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="createRoom()" style="color: black">
+                    만들기
+                </button>
+            </div>
         </div>
 
     </div>
@@ -270,77 +285,71 @@
 <!-- end features list section -->
 
 <!-- products -->
-<div class="product-section mt-150 mb-150">
+<div class="product-section mb-150">
     <div class="container" style="text-align: center">
-
-        <!--
-        // 페이지 이동 주석
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <div class="pagination-wrap">
-                    <ul>
-                        <li><a href="#">Prev</a></li>
-                        <li><a href="#">1</a></li>
-                        <li><a class="active" href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">Next</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        -->
-
-    </div>
-</div>
-<!-- end products -->
-
-<!-- copyright start -->
-<div class="copyright">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-6 col-md-12">
-                <p>Copyrights &copy; 2021 - 피버타임, All Rights
-                    Reserved.
-                </p>
-                <!--                <a href="https://imransdesign.com/">Imran Hossain</a> -->
-            </div>
-            <div class="col-lg-6 text-right col-md-12">
-                <div class="social-icons">
-                    <!-- <ul>
-                        <li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
-                        <li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
-                        <li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
-                        <li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
-                        <li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
-                    </ul> -->
+        <div class="row product-lists" id="room-list">
+            <div class="card border-dark mb-3"
+                 style="max-width: 18rem;margin-left: 100px;margin-top: 50px;width: 250px;height: 215px">
+                <div class="card-header">개설일</div>
+                <div class="card-body text-dark">
+                    <h5 class="card-title">채팅방 이름</h5>
+                    <p class="card-text">참여인원 : 0명</p>
+                    <button type="button" class="btn" style="background-color: #F28123;border-color: #F28123"
+                            onclick="location.href='room-detail.html?roomId=${id}'">참가하기
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<!-- copyright end -->
+    <!-- end products -->
 
-<!-- bootstrap js start -->
-<!-- jquery -->
-<script src="./static/assets/js/jquery-1.11.3.min.js"></script>
-<!-- bootstrap -->
-<script src="./static/assets/bootstrap/js/bootstrap.min.js"></script>
-<!-- count down -->
-<script src="./static/assets/js/jquery.countdown.js"></script>
-<!-- isotope -->
-<script src="./static/assets/js/jquery.isotope-3.0.6.min.js"></script>
-<!-- waypoints -->
-<script src="./static/assets/js/waypoints.js"></script>
-<!-- owl carousel -->
-<script src="./static/assets/js/owl.carousel.min.js"></script>
-<!-- magnific popup -->
-<script src="./static/assets/js/jquery.magnific-popup.min.js"></script>
-<!-- mean menu -->
-<script src="./static/assets/js/jquery.meanmenu.min.js"></script>
-<!-- sticker js -->
-<script src="./static/assets/js/sticker.js"></script>
-<!-- main js -->
-<script src="./static/assets/js/main.js"></script>
-<!-- bootstrap js end -->
+    <!-- copyright start -->
+    <div class="copyright">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-12">
+                    <p>Copyrights &copy; 2021 - 피버타임, All Rights
+                        Reserved.
+                    </p>
+                    <!--                <a href="https://imransdesign.com/">Imran Hossain</a> -->
+                </div>
+                <div class="col-lg-6 text-right col-md-12">
+                    <div class="social-icons">
+                        <!-- <ul>
+                            <li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+                            <li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
+                            <li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
+                            <li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+                            <li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
+                        </ul> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- copyright end -->
+
+    <!-- bootstrap js start -->
+    <!-- jquery -->
+    <script src="./static/assets/js/jquery-1.11.3.min.js"></script>
+    <!-- bootstrap -->
+    <script src="./static/assets/bootstrap/js/bootstrap.min.js"></script>
+    <!-- count down -->
+    <script src="./static/assets/js/jquery.countdown.js"></script>
+    <!-- isotope -->
+    <script src="./static/assets/js/jquery.isotope-3.0.6.min.js"></script>
+    <!-- waypoints -->
+    <script src="./static/assets/js/waypoints.js"></script>
+    <!-- owl carousel -->
+    <script src="./static/assets/js/owl.carousel.min.js"></script>
+    <!-- magnific popup -->
+    <script src="./static/assets/js/jquery.magnific-popup.min.js"></script>
+    <!-- mean menu -->
+    <script src="./static/assets/js/jquery.meanmenu.min.js"></script>
+    <!-- sticker js -->
+    <script src="./static/assets/js/sticker.js"></script>
+    <!-- main js -->
+    <script src="./static/assets/js/main.js"></script>
+    <!-- bootstrap js end -->
 </body>
 </html>
