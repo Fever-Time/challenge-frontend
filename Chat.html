@@ -90,12 +90,7 @@
     </style>
     <script>
         $(document).ready(function () {
-            getChallenges("All");
             loginStatus();
-            $("input:button[name='button']").on('click', function () {
-                getChallenges($(this).val());
-            });
-
             $.ajaxSetup({
                 error: function (jqXHR, exception) {
                     switch (jqXHR.status) {
@@ -107,83 +102,7 @@
             });
         })
 
-        function getChallenges(kind) {
-            $.ajax({
-                type: "GET",
-                url: `https://api.fevertime.shop/challenges?kind=${kind}`,
-                data: {},
-                success: function (response) {
-                    showChallenges(response)
-                }
-            })
-        }
 
-        function showChallenges(challenges) {
-            console.log(challenges);
-            if (challenges.length === 0) {
-                $('#no_challenge').show()
-                $('#challenge-list').empty()
-                return
-            }
-            $('#no_challenge').hide();
-            $('#challenge-list').empty();
-
-            for (let i = 0; i < challenges.length; i++) {
-                let id = challenges[i]['challengeId'];
-                let title = challenges[i]['title'];
-                // let desc = challenges[i]['description'];
-                let img = challenges[i]['imgUrl'];
-                let start = challenges[i]['startDate'];
-                let end = challenges[i]['endDate'];
-                let limitPerson = challenges[i]['limitPerson'];
-                let participants = challenges[i]['participants'];
-                let endDate = new Date(challenges[i]['endDate'])
-
-                let temp_html = `<div class="col-lg-4 col-md-6 text-center product-lists">
-                                                <div class="single-product-item">
-                                                    <div class="product-image">
-                                                        <a onclick="location.href='challenge-detail.html?challengeId=${id}'">
-                                                            <img src="${img}"
-                                                                 alt="">
-                                                        </a>
-                                                    </div>
-                                                    <h3>${title}</h3>
-                                                    <p class="product-price">
-                                                        <span>
-                                                            <i class="far fa-calendar-alt"></i> ${start} ~ ${end}
-                                                        </span>
-                                                            ${participants}/${limitPerson}명
-                                                        </p>
-                                                        <div id="${id}-check-challenge">
-                                                        </div>
-
-                                                </div>
-                                            </div>`
-                $('#challenge-list').append(temp_html)
-                plusButton(id, endDate)
-            }
-
-        }
-
-        //기간 종료 버튼
-        function plusButton(id, endDate) {
-            let nowDate = new Date()
-
-            if (nowDate > endDate.setHours(23, 59, 59)) {
-                let temp_html = `<a class="cart-btn btnp" onclick="location.href='challenge-detail.html?challengeId=${id}'">
-                    <i class="fas fa-bolt"></i>챌린지 기간 종료
-                </a>
-            `
-                $(`#${id}-check-challenge`).append(temp_html);
-            } else {
-                let temp_html = `
-                <a onclick="location.href='challenge-detail.html?challengeId=${id}'" class="cart-btn">
-                    <i class="fas fa-bolt"></i> View Details
-                </a>`
-                $(`#${id}-check-challenge`).append(temp_html);
-            }
-
-        }
 
         //로그인되어있을때는 로그아웃 버튼 보이기
         function loginStatus() {
@@ -199,52 +118,6 @@
         function logout() {
             localStorage.removeItem("token");
             location.href = "index.html";
-        }
-
-        function onClickCreateChallenge() {
-            if (localStorage.getItem("token") == null) {
-                alert("로그인 후 생성해주세요 !!")
-            } else {
-                // 챌린지 생성 3개 제한
-                $.ajax({
-                    type: "GET",
-                    url: "https://api.fevertime.shop/user/challenges/create",
-                    data: {},
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-                    },
-                    success: function (response) {
-                        if (response.length >= 3) {
-                            alert("챌린지는 3개까지 생성할 수 있어요!")
-                        } else {
-                            window.location.href = "challenge-create.html"
-                        }
-                    },
-                    error: function () {
-                        alert("로그인 후 생성해주세요 !!")
-                    }
-                })
-            }
-        }
-
-        function getSearchChallenges() {
-            let search = $("#search-input").val();
-
-            if (search == "") {
-                alert("검색어를 입력해주세요.")
-                return
-            }
-
-            $.ajax({
-                type: "GET",
-                url: "https://api.fevertime.shop/challenges/search",
-                data: {"search": search},
-                success: function (response) { // 성공하면
-                    $(".search-area").toggleClass("search-active")
-                    $('#challenge-list').empty();
-                    showChallenges(response)
-                }
-            })
         }
 
         function onClickMyPage() {
@@ -400,29 +273,6 @@
 <div class="product-section mt-150 mb-150">
     <div class="container" style="text-align: center">
 
-        <div class="row" id="container__category">
-            <div class="col-md-12">
-                <div class="product-filters">
-                    <ul>
-                        <input type="button" id="All" name="button" value="All" class="btn btn-outline-light"/>
-                        <input type="button" id="운동" name="button" value="운동" class="btn btn-outline-light"/>
-                        <input type="button" id="공부" name="button" value="공부" class="btn btn-outline-light"/>
-                        <input type="button" id="취미" name="button" value="취미" class="btn btn-outline-light"/>
-                        <input type="button" id="독서" name="button" value="독서" class="btn btn-outline-light"/>
-                        <input type="button" id="기타" name="button" value="기타" class="btn btn-outline-light"/>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div id="no_challenge" style="display: none">
-            <img src="./static/assets/img/error.svg" width="300" height="300"
-                 alt="">
-            <h4 style="margin-top: 30px">챌린지가 없습니다😥</h4>
-        </div>
-
-        <div class="row product-lists" id="challenge-list">
-
-        </div>
         <!--
         // 페이지 이동 주석
         <div class="row">
@@ -440,15 +290,6 @@
         </div>
         -->
 
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <div class="pagination-wrap">
-                    <a id="add-btn" class="cart-btn" onclick="onClickCreateChallenge()">
-                        <i class="fas fa-plus"></i> Add new Challenge
-                    </a>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 <!-- end products -->
