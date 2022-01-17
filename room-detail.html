@@ -103,9 +103,34 @@
                     }
                 }
             });
+            loginStatus()
             getRoomInfo();
             onSocket();
         })
+
+        //로그인되어있을때는 로그아웃 버튼 보이기
+        function loginStatus() {
+            if (localStorage.getItem("token") == null) {
+                $('#logout').hide();
+                $('#login').show();
+            } else {
+                $('#login').hide();
+                $('#logout').show();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("token");
+            location.href = "index.html";
+        }
+
+        function onClickMyPage() {
+            if (localStorage.getItem("token") == null) {
+                alert("로그인을 해주세요!");
+            } else {
+                location.href = "user.html";
+            }
+        }
 
         //웹소켓연결
         function onSocket() {
@@ -133,15 +158,10 @@
                         }
                     })
                 });
-                roomEnter();
+                stompClient.send("/pub/chat/enter", {}, JSON.stringify({
+                    'roomId': roomId, 'sender': userOwn, 'message': "입장했습니다."
+                }))
             });
-        }
-
-        //입장 메세지 보내기
-        function roomEnter() {
-            stompClient.send("/pub/chat/enter", {}, JSON.stringify({
-                'roomId': roomId, 'sender': userOwn, 'message': "입장했습니다."
-            }))
         }
 
         //채팅방 정보 가져오기
@@ -184,12 +204,12 @@
             imgLink = response['imgUrl'];
             if (userOwn !== kakaoId) {
                 let temp = `
-                            <div id="userChat" class="row" style="display: inline-flex">
+                            <div id="userChat" class="row" style="display: inline-flex; align-items: center;">
                             <div class="writer">
                                     <img src="${imgLink}" style="width: 40px; border-radius: 100%; display:block" hspace=10>
                                     <b style="font-size: small;margin-left: 12px">${username}</b>
                                 </div>
-                               <div class="alert alert-info" role="alert" style="width: 500px; margin-right: 50px">
+                               <div class="alert alert-info" role="alert" style="width: 500px; margin-right: 50px;border-radius: 50px">
                                   ${message}
                                 </div>
                             </div>
@@ -197,8 +217,8 @@
                 $("#message").append(temp);
             } else {
                 let temp = `
-                            <div id="userChat" class="row" style="display: inline-flex">
-                            <div class="alert alert-warning" role="alert" style="width: 500px; margin-left: 70px">
+                            <div id="userChat" class="row" style="display: inline-flex; align-items: center;">
+                            <div class="alert alert-warning" role="alert" style="width: 500px; margin-left: 70px;border-radius: 50px">
                                   ${message}
                                 </div>
                             <div class="writer">
@@ -285,7 +305,9 @@
                                 <a href="#" style="margin-right: 150px">User</a>
                                 <ul class="sub-menu">
                                     <li><a href="#" onclick="onClickMyPage()">My Page</a></li>
-                                    <li><a href="#" data-toggle="modal" data-target="#exampleModal">Login</a></li>
+                                    <li id="login"><a href="#" data-toggle="modal"
+                                                      data-target="#exampleModal">Login</a></li>
+                                    <li id="logout"><a href="#" onclick="logout()">Logout</a></li>
                                 </ul>
                             </li>
 
