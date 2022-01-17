@@ -77,7 +77,7 @@
 
         .center {
             background-color: whitesmoke;
-            width: 900px;
+            width: 800px;
             height: 100%;
             min-height: 700px;
             border-radius: 20px;
@@ -85,14 +85,25 @@
     </style>
     <script>
         let roomName;
+        let creator;
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
         let roomId = urlParams.get('roomId')
+        let userOwn = localStorage.getItem('username');
 
         let stompClient = null;
 
         $(document).ready(function () {
-            getRoomInfo()
+            $.ajaxSetup({
+                error: function (jqXHR, exception) {
+                    switch (jqXHR.status) {
+                        case 401:
+                            alert('로그인을 해주세요.');
+                            window.location.href = "chat.html"
+                    }
+                }
+            });
+            getRoomInfo();
             onSocket();
         })
 
@@ -102,12 +113,25 @@
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function () {
                 stompClient.subscribe('/sub/chat/room/' + roomId, function (chat) {
-                    console.log(chat.body)
-                    let temp = `
-                       <div class="alert alert-info" role="alert">
-                          ${chat.body.split('"')[7]}
-                        </div>`
-                    $("#message").append(temp);
+
+                    //메시지 날린사람 정보 가져오기
+                    let kakaoId = chat.body.split('"')[7];
+                    let message = chat.body.split('"')[11];
+
+                    $.ajax({
+                        type: "GET",
+                        url: `https://api.fevertime.shop/user/${kakaoId}`,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                        },
+                        success: function (response) {
+                            username = response['username'];
+                            imgLink = response['imgUrl'];
+                            console.log(response)
+                            //보낸 메시지 나타내기
+                            showMsg(response, kakaoId, message);
+                        }
+                    })
                 });
                 roomEnter();
             });
@@ -116,7 +140,7 @@
         //입장 메세지 보내기
         function roomEnter() {
             stompClient.send("/pub/chat/enter", {}, JSON.stringify({
-                'roomId': roomId, 'message': "입장했습니다."
+                'roomId': roomId, 'sender': userOwn, 'message': "입장했습니다."
             }))
         }
 
@@ -130,7 +154,12 @@
                     console.log(response);
                     roomId = response['roomId'];
                     roomName = response['name'];
+                    creator = response['creator'];
                     $('#room-name').text(roomName);
+                    //채팅방 개설자는 삭제버튼 보이기
+                    if (creator === userOwn) {
+                        $('#chatButton').append(`<button type="button" class="btn btn-danger" style="margin-left: 10px" onclick="deleteRoom()">채팅 방 삭제</button>`)
+                    }
                 }
             });
         }
@@ -140,18 +169,79 @@
             let msg = $("#chatMsg").val();
             console.log(msg)
             if (msg !== "") {
-                stompClient.send("/pub/chat/message", {}, JSON.stringify({'roomId': roomId, 'message': msg}));
+                stompClient.send("/pub/chat/message", {}, JSON.stringify({
+                    'roomId': roomId,
+                    'sender': userOwn,
+                    'message': msg
+                }));
                 $("#chatMsg").val("");
+            }
+        }
+
+        //채팅메시지 보이기
+        function showMsg(response, kakaoId, message) {
+            username = response['username'];
+            imgLink = response['imgUrl'];
+            if (userOwn !== kakaoId) {
+                let temp = `
+                            <div id="userChat" class="row" style="display: inline-flex">
+                            <div class="writer">
+                                    <img src="${imgLink}" style="width: 40px; border-radius: 100%; display:block" hspace=10>
+                                    <b style="font-size: small;margin-left: 12px">${username}</b>
+                                </div>
+                               <div class="alert alert-info" role="alert" style="width: 500px; margin-right: 50px">
+                                  ${message}
+                                </div>
+                            </div>
+                               `
+                $("#message").append(temp);
+            } else {
+                let temp = `
+                            <div id="userChat" class="row" style="display: inline-flex">
+                            <div class="alert alert-warning" role="alert" style="width: 500px; margin-left: 70px">
+                                  ${message}
+                                </div>
+                            <div class="writer">
+                                    <img src="${imgLink}" style="width: 40px; border-radius: 100%; display:block" hspace=10>
+                                    <b style="font-size: small;margin-left: 12px">${username}</b>
+                                </div>
+                            </div>
+                               `
+                $("#message").append(temp);
             }
         }
 
         //채팅방 나가기
         function exitRoom() {
-            stompClient.send("/pub/chat/exit", {}, JSON.stringify({'roomId': roomId, 'message': "퇴장하셨습니다."}));
+            stompClient.send("/pub/chat/exit", {}, JSON.stringify({
+                'roomId': roomId,
+                'sender': userOwn,
+                'message': "퇴장했습니다."
+            }));
             if (stompClient !== null) {
                 stompClient.disconnect();
             }
             window.location.href = "chat.html"
+        }
+
+        //채팅방 삭제
+        function deleteRoom() {
+            let agree = confirm("정말 삭제하시겠습니까?");
+            if (agree === false) {
+                alert("취소 되었습니다.");
+            } else {
+                $.ajax({
+                    type: "DELETE",
+                    url: `https://api.fevertime.shop/chat/room/${roomId}`,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                    },
+                    success: function (response) {
+                        alert(response['msg']);
+                        window.location.href = "chat.html"
+                    }
+                })
+            }
         }
 
     </script>
@@ -279,12 +369,12 @@
             채팅 방 : <span id="room-name">name</span>
         </div>
         <div id="chatRoom">
-            <div id="message">
+            <div id="message" style="text-align: center">
 
             </div>
             <div class="input-group mb-3" style="width: 500px; margin: 200px auto auto auto">
                 <input type="text" class="form-control" placeholder="메시지를 입력하세요" id="chatMsg">
-                <div class="input-group-append">
+                <div class="input-group-append" id="chatButton">
                     <button class="btn btn-outline-secondary" type="button" onclick="msgSend()">전송</button>
                     <button type="button" class="btn btn-secondary" style="margin-left: 10px" onclick="exitRoom()">나가기
                     </button>
