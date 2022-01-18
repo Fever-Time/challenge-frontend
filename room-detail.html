@@ -140,9 +140,10 @@
                 stompClient.subscribe('/sub/chat/room/' + roomId, function (chat) {
 
                     //메시지 날린사람 정보 가져오기
-                    let kakaoId = chat.body.split('"')[7];
-                    let message = chat.body.split('"')[11];
+                    let kakaoId = JSON.parse(chat.body).sender
+                    let message = JSON.parse(chat.body).message
 
+                    //카카오 아이디로 유저이름, 사진 가져오기
                     $.ajax({
                         type: "GET",
                         url: `https://api.fevertime.shop/user/${kakaoId}`,
@@ -152,14 +153,13 @@
                         success: function (response) {
                             username = response['username'];
                             imgLink = response['imgUrl'];
-                            console.log(response)
                             //보낸 메시지 나타내기
                             showMsg(response, kakaoId, message);
                         }
                     })
                 });
                 stompClient.send("/pub/chat/enter", {}, JSON.stringify({
-                    'roomId': roomId, 'sender': userOwn, 'message': "입장했습니다."
+                    'roomId': roomId, 'sender': userOwn, 'message': "채팅 방에 입장했습니다."
                 }))
             });
         }
@@ -171,7 +171,6 @@
                 url: `https://api.fevertime.shop/chat/room/${roomId}`,
                 data: {},
                 success: function (response) {
-                    console.log(response);
                     roomId = response['roomId'];
                     roomName = response['name'];
                     creator = response['creator'];
@@ -187,7 +186,6 @@
         //채팅 전송
         function msgSend() {
             let msg = $("#chatMsg").val();
-            console.log(msg)
             if (msg !== "") {
                 stompClient.send("/pub/chat/message", {}, JSON.stringify({
                     'roomId': roomId,
@@ -204,21 +202,24 @@
             imgLink = response['imgUrl'];
             if (userOwn !== kakaoId) {
                 let temp = `
-                            <div id="userChat" class="row" style="display: inline-flex; align-items: center;">
-                            <div class="writer">
-                                    <img src="${imgLink}" style="width: 40px; border-radius: 100%; display:block" hspace=10>
-                                    <b style="font-size: small;margin-left: 12px">${username}</b>
+                        <div id="msgFrom" style="text-align: left; margin: 0 30px 0 30px">
+                            <div id="userChat" class="row" style="display: inline-flex; align-items: center;text-align:left">
+                                <div class="writer">
+                                        <img src="${imgLink}" style="width: 40px; border-radius: 100%; display:block" hspace=10>
+                                        <b style="font-size: small;margin-left: 12px">${username}</b>
+                                    </div>
+                                   <div class="alert alert-info" role="alert" style="margin-right: 50px;border-radius: 20px; max-width: 500px">
+                                      ${message}
+                                    </div>
                                 </div>
-                               <div class="alert alert-info" role="alert" style="width: 500px; margin-right: 50px;border-radius: 50px">
-                                  ${message}
-                                </div>
-                            </div>
+                        </div>
                                `
                 $("#message").append(temp);
             } else {
                 let temp = `
-                            <div id="userChat" class="row" style="display: inline-flex; align-items: center;">
-                            <div class="alert alert-warning" role="alert" style="width: 500px; margin-left: 70px;border-radius: 50px">
+                    <div id="msgFrom" style="text-align: right; margin: 0 30px 0 30px;">
+                            <div id="userChat" class="row" style="display: inline-flex; align-items: center; text-align: right">
+                            <div class="alert alert-warning" role="alert" style="margin-left: 70px;border-radius: 20px; max-width: 500px">
                                   ${message}
                                 </div>
                             <div class="writer">
@@ -226,6 +227,7 @@
                                     <b style="font-size: small;margin-left: 12px">${username}</b>
                                 </div>
                             </div>
+                    </div>
                                `
                 $("#message").append(temp);
             }
@@ -236,7 +238,7 @@
             stompClient.send("/pub/chat/exit", {}, JSON.stringify({
                 'roomId': roomId,
                 'sender': userOwn,
-                'message': "퇴장했습니다."
+                'message': "채팅 방에서 퇴장했습니다."
             }));
             if (stompClient !== null) {
                 stompClient.disconnect();
@@ -391,10 +393,7 @@
             채팅 방 : <span id="room-name">name</span>
         </div>
         <div id="chatRoom">
-            <div id="message" style="text-align: center">
-
-            </div>
-            <div class="input-group mb-3" style="width: 500px; margin: 200px auto auto auto">
+            <div class="input-group mb-3" style="width: 500px; margin: auto; padding: 10px 0 30px 0 ">
                 <input type="text" class="form-control" placeholder="메시지를 입력하세요" id="chatMsg">
                 <div class="input-group-append" id="chatButton">
                     <button class="btn btn-outline-secondary" type="button" onclick="msgSend()">전송</button>
@@ -402,6 +401,10 @@
                     </button>
                 </div>
             </div>
+            <div id="message">
+
+            </div>
+
         </div>
     </div>
 </div>
