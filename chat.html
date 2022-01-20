@@ -98,7 +98,6 @@
             if (localStorage.getItem("token") == null) {
                 alert("로그인 후 참가해주세요 !!")
             } else {
-                console.log(idx)
                 window.location.href = `room-detail.html?roomId=${idx}`
             }
         }
@@ -110,26 +109,25 @@
                     url: `https://api.fevertime.shop/chat/rooms`,
                     contentType: 'application/json; charset=utf-8',
                     success: function (response) {
-                        console.log(response)
                         let all_rooms = response;
                         for (let i = 0; i < all_rooms.length; i++) {
                             let idx = all_rooms[i]['roomId'];
                             let name = all_rooms[i]['name'];
                             let date = all_rooms[i]['createdDate']
-                            let creator = all_rooms[i]['creator']
+                            let userCount = all_rooms[i]['userCount']
 
-                                let temp_html = `<div class="card border-dark mb-3"
+                            let temp_html = `<div class="card border-dark mb-3"
                                  style="max-width: 18rem;margin-left: 100px;margin-top: 50px;width: 250px;height: 215px">
                                 <div class="card-header">개설일 : ${date}</div>
                                 <div class="card-body text-dark">
                                     <h5 class="card-title">${name}</h5>
-                                    <p class="card-text">참여인원 : 0명</p>
+                                    <p class="card-text">참여 인원 : ${userCount}명</p>
                                     <button type="button" class="btn" style="background-color: #F28123;border-color: #F28123"
                                             onclick="joinRoom(${idx})">참가하기
                                     </button>
                                 </div>
                             </div>`;
-                                $('#room-list').append(temp_html)
+                            $('#room-list').append(temp_html)
                         }
                     }
                 }
@@ -138,13 +136,18 @@
 
         //채팅방 개설
         function createRoom() {
-            let name = $('#room_name').val()
-            if (name !== "") {
+            let roomName = $('#room_name').val();
+            let data = {
+                "name": $('#room_name').val(),
+                "userCount": 0
+            }
+
+            if (roomName !== "") {
                 $.ajax({
                     type: "POST",
                     url: `https://api.fevertime.shop/chat/room`,
                     contentType: "application/json",
-                    data: JSON.stringify(name),
+                    data: JSON.stringify(data),
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
                     },

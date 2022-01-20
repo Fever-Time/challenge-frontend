@@ -86,6 +86,7 @@
     <script>
         let roomName;
         let creator;
+        let userCount;
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
         let roomId = urlParams.get('roomId')
@@ -104,8 +105,8 @@
                 }
             });
             loginStatus()
-            getRoomInfo();
             onSocket();
+            getRoomInfo();
         })
 
         //로그인되어있을때는 로그아웃 버튼 보이기
@@ -138,6 +139,8 @@
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function () {
                 stompClient.subscribe('/sub/chat/room/' + roomId, function (chat) {
+                    //subscribe api에 메시지 날릴때마다 채팅방 인원수 가져오기
+                    getUserCount();
 
                     //메시지 날린사람 정보 가져오기
                     let kakaoId = JSON.parse(chat.body).sender
@@ -164,7 +167,7 @@
             });
         }
 
-        //채팅방 정보 가져오기
+        //채팅방 정보 가져오기 (채팅방 이름, 삭제버튼 )
         function getRoomInfo() {
             $.ajax({
                 type: "GET",
@@ -174,11 +177,25 @@
                     roomId = response['roomId'];
                     roomName = response['name'];
                     creator = response['creator'];
+                    userCount = response['userCount'];
                     $('#room-name').text(roomName);
                     //채팅방 개설자는 삭제버튼 보이기
                     if (creator === userOwn) {
                         $('#chatButton').append(`<button type="button" class="btn btn-danger" style="margin-left: 10px" onclick="deleteRoom()">채팅 방 삭제</button>`)
                     }
+                }
+            });
+        }
+
+        //채팅방 참여 인원 가져오기
+        function getUserCount() {
+            $.ajax({
+                type: "GET",
+                url: `https://api.fevertime.shop/chat/room/${roomId}`,
+                data: {},
+                success: function (response) {
+                    userCount = response['userCount'];
+                    $('#user-count').text(userCount);
                 }
             });
         }
@@ -390,7 +407,8 @@
 <div class="single-product mt-150 mb-150">
     <div class="container center">
         <div class="alert alert-light" role="alert" style="font-weight: bold; text-align: center">
-            채팅 방 : <span id="room-name">name</span>
+            채팅 방 : <span id="room-name">name</span> -
+            <span class="badge badge-info" id="user-count">Info</span>명
         </div>
         <div id="chatRoom">
             <div class="input-group mb-3" style="width: 500px; margin: auto; padding: 10px 0 30px 0 ">
