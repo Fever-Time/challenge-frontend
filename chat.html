@@ -154,6 +154,11 @@
                     success: function (response) {
                         alert(response['msg']);
                         window.location.reload();
+                    },
+                    error: function () {
+                        alert("다시 로그인 후 시도해주세요.")
+                        localStorage.removeItem("token");
+                        window.location.reload();
                     }
                 });
             } else {
